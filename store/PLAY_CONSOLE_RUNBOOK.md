@@ -23,7 +23,7 @@ uploading.
 | Listing limits | App name **15/30**, short description **71/80**, full description **2,284/4,000**, release notes **247/500** characters |
 | Privacy page | [`docs/privacy.html`](../docs/privacy.html) exists (4,066 B) with the contact set to `tronjohnson57@gmail.com`; no placeholder remains |
 | Policy text | [`store/privacy-policy.md`](privacy-policy.md) exists with the same contact in both places |
-| Privacy hosting | [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) publishes [`docs/`](../docs/) to GitHub Pages on pushes to `main`; [`docs/.nojekyll`](../docs/.nojekyll) is present. **Live check 2026-10-29: the canonical URL returns 404 (“Site not found”); the workflow’s authenticated `configure-pages` step reports `Get Pages site failed: Not Found` and cannot create the site (`Resource not accessible by integration`). The public Pages API is rate-limited from this sandbox (403). Do not enter the URL in Play yet — the browser check in FALLBACK shows no public HTML URL currently verifies.** |
+| Privacy hosting | [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) publishes [`docs/`](../docs/) to GitHub Pages on pushes to `main`; [`docs/.nojekyll`](../docs/.nojekyll) is present. **Live check 2026-10-29: the repository is public (an anonymous request for <https://github.com/SantJohnson21/idk> returns 200), the workflow was re-run by push `8af69a5` at 06:09 UTC, and fifteen polls from 06:10:39 to 06:13:00 UTC all returned 404 (`Site not found · GitHub Pages`). `actions/configure-pages@v5` still reports `Get Pages site failed: Not Found`, then `Create Pages site failed: Resource not accessible by integration`, so this is a token-permission wall, not a visibility one: only a repository admin can create the Pages site. Do not enter the URL in Play yet — no public HTML URL currently verifies (see FALLBACK).** |
 | Declarations file | [`store/data-safety.md`](data-safety.md) exists |
 | Merged permissions | `android.permission.INTERNET`, `android.permission.VIBRATE`, and the app-defined `com.rewindbowl.game.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` — **no `AD_ID`**, no location, camera, microphone, contacts, storage or notification permission |
 | Ads / analytics | No ads or analytics dependencies in [`package.json`](../package.json); `google-services.json` is absent; source search finds no AdMob/AdSense/AppLovin/Unity Ads/IronSource/Firebase/AppsFlyer/Adjust/Sentry/Bugsnag/Segment/Mixpanel/PostHog usage |
@@ -62,21 +62,36 @@ user-data permission.
 
 ## FALLBACK — if the privacy URL is still 404
 
-**Status checked 2026-10-29.** `https://santjohnson21.github.io/idk/privacy.html`
-returns **404** (“Site not found”). The public Pages API reads are currently
-blocked by this sandbox IP’s unauthenticated rate limit: **403**,
-`API rate limit exceeded` (reset 06:39 UTC). The authenticated workflow output is
-the useful signal: `actions/configure-pages@v5` reports `Get Pages site failed:
-Not Found`, then `Create Pages site failed: Resource not accessible by
-integration`. Both runs (`40817742903`, `40824702390`) fail at that step.
+**Status checked 2026-10-29, twice.** `https://santjohnson21.github.io/idk/privacy.html`
+returns **404** (“Site not found · GitHub Pages”). The second check was run after
+confirming the repository is public (anonymous repo page: **200**, which it would
+not be if the repo were private) and after pushing `8af69a5` at 06:09 UTC to
+trigger the workflow: **fifteen polls, 06:10:39 → 06:13:00 UTC, all 404**. The
+site is never created, so nothing is being published — the deploy does not fail
+*after* publishing.
 
-**Browser check 2026-10-29 (412×892):** the claimed interim
-`raw.githack.com/.../privacy.html` returns **200 text/html**, but Chromium gets
-`External Content Notice | rawgit.hack` with one `mailto:admin@githack.com` and no
-policy content. `cdn.jsdelivr.net` and `cdn.statically.io` serve the policy as
-`text/plain`. `htmlpreview.github.io` is a 1,269-byte JavaScript wrapper with no
-policy text in the served HTML. **No public HTML URL currently verifies**; keep
-the canonical URL pending.
+The authenticated workflow output is the useful signal: `actions/configure-pages@v5`
+reports `Get Pages site failed: Not Found`, then `Create Pages site failed:
+Resource not accessible by integration`. That is a token-permission error, and the
+Actions `GITHUB_TOKEN` cannot hold repository admin, so the workflow can never
+create the site on its own. The public Pages API reads remain rate-limited from
+this sandbox IP: **403**, `API rate limit exceeded` (0 of 60 remaining).
+
+A managed static host was tried as an alternative home for `docs/` and its deploy
+API rejected every upload (`invalid_type`) on both environments, so it is not a
+route this repo can rely on.
+
+**Browser check 2026-10-29 (412×892), re-run with the repository public:** both
+`raw.githack.com/.../privacy.html` and `rawcdn.githack.com/.../privacy.html`
+return **200 text/html** to `curl` with a phone user agent and now carry the real
+4,066-byte page (2 `mailto:` links, full policy text), but headless Chromium in
+both cases receives `External Content Notice | rawgit.hack`: one
+`mailto:admin@githack.com?subject=Abuse`, no policy content — **7 of 11 checks
+fail on each host**. `cdn.jsdelivr.net` and `cdn.statically.io` serve the policy
+as `text/plain`. `htmlpreview.github.io` is a 1,269-byte JavaScript wrapper with
+no policy text in the served HTML. **No public HTML URL currently verifies**;
+`.qa/privacy-live.mjs` is the check that will prove the canonical URL once it
+exists (`RB_PRIVACY_URL=https://santjohnson21.github.io/idk/privacy.html node .qa/privacy-live.mjs`).
 
 **Local verification 2026-10-29 (412×892):** `docs/privacy.html` was served from
 the repo with `python3 -m http.server 4174 --bind 127.0.0.1 --directory docs`
@@ -141,12 +156,13 @@ Have these ready:
 
 **Privacy hosting:** the contact placeholder is gone; both the page and
 `store/privacy-policy.md` use `tronjohnson57@gmail.com`. The Pages workflow is
-committed, but the site is not enabled: on 2026-10-29 the canonical URL returned
-**404**. The public Pages API is rate-limited from this sandbox (**403**, reset
-06:39 UTC); the workflow’s authenticated `configure-pages` step reports
+committed, the repository is public, and the site still does not exist: on
+2026-10-29 the canonical URL returned **404** on fifteen consecutive polls after
+a fresh push. The workflow’s authenticated `configure-pages` step reports
 `Get Pages site failed: Not Found` and `Create Pages site failed: Resource not
-accessible by integration`. Do not submit App content with this URL until it
-returns 200. See **FALLBACK** below for the one-time fix.
+accessible by integration` — only a repository admin can create the site. Do not
+submit App content with this URL until it returns 200. See **FALLBACK** below for
+the one-time fix.
 
 **Signing:** the AAB is signed with the upload key in
 `android/rewind-bowl-upload.jks`. Keep that file and `android/keystore.properties`

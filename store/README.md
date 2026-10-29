@@ -32,5 +32,9 @@ and re-copy.
 Copy lives in [`listing.md`](listing.md), declarations in
 [`data-safety.md`](data-safety.md), and the policy in
 [`privacy-policy.md`](privacy-policy.md); the public HTML page is
-[`../docs/privacy.html`](../docs/privacy.html). The click-by-click console
-sequence is in [`../PLAY.md`](../PLAY.md).
+[`../docs/privacy.html`](../docs/privacy.html). The 12-tester invitation and the
+exact first-build release notes are in
+[`closed-test-invite.md`](closed-test-invite.md). The click-by-click console
+sequence is in [`../PLAY.md`](../PLAY.md). The roster, 14-day opt-in grid,
+severity scale and report table for the test itself are in
+[`tester-feedback-log.md`](tester-feedback-log.md).
