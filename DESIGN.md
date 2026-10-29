@@ -148,14 +148,25 @@ plays (+12), broken tackles (+7), and drained by turnovers (−6).
 - Quirks are verbs: CANNON (+8 ARM on deep shots), BALLHAWK, IRON MAN (35% slower stamina drain),
   CLUTCH (+7 to everything in the fourth), SHOWTIME (+50% hype), SNIPER (wide kick window),
   MAGNET, BRUISER, BURNER, SURE HANDS, FIELD GENERAL.
+- **Ages 18–40, one birthday per offseason.** The camp curve is the career: about +4 rating points
+  at 18, fading every year to nothing by 27, level through the prime at 28, then decline from 29
+  that steepens to −6 at 40. Decline hits speed and tackling before arm and hands and stops at a
+  floor of 30, so a veteran is diminished rather than ruined. Ages come back on the roster, the
+  training card, the market and a winter camp report.
+- **PRODIGY, the rare career trait (about 1 in 12).** Separate from quirks: it changes what a
+  player becomes, not what he does on a snap. Camp growth is paid at 1.6×, decline at 0.55×, and
+  training costs 75% of the tape price. It is derived from the player's own name, position and
+  number, so a fixed seed reproduces the same career; the roster, training card, market and camp
+  report mark him with a gold star.
 
 ### 5.5 Season and offseason
 
 - 8 weeks, 8 teams, top 4 seeds, semifinal, Gridiron Bowl.
 - Standings, point differential, seed line, and a "road to the bowl" bracket.
-- **Offseason:** a five-prospect scouting report with position-weighted grades (a cornerback is not
-  judged on his arm), one signing, and one cut — with roster minimums enforced so you cannot cut
-  your way into an illegal lineup. The draft's cut is a straight release; the market is where men
+- **Offseason:** every player turns a year older and runs training camp (the age curve above, with
+  the biggest movers listed), then a five-prospect scouting report with position-weighted grades
+  (a cornerback is not judged on his arm), one signing, and one cut — with roster minimums enforced
+  so you cannot cut your way into an illegal lineup. The draft's cut is a straight release; the market is where men
   are bought and sold, and it is open all season.
 - **The market:** six veterans on the wire, priced off a position-weighted grade, their position and
   their quirk. A signing goes into the depth chart where his grade says he belongs, so a bought star
@@ -177,7 +188,7 @@ toggleable, and the save hydrates defensively so an old save keeps working.
 
 ### 5.8 Your club
 
-- **You choose who you coach.** Any of the league's eight clubs can be yours; each carries its own
+- **You choose who you coach.** Any of the league's sixteen clubs can be yours; each carries its own
   offence, defence and kicking grades, and the schedule is built around the one you pick — you
   never play yourself.
 - **The club editor** (hub → `✎ EDIT CLUB`) owns the identity: city, nickname, three-letter

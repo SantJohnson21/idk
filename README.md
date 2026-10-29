@@ -2,7 +2,7 @@
 
 A tap-first retro football game for phones, played in a VHS broadcast that never quite stops rolling.
 
-You pick one of the Gridiron League's eight clubs and call its offense: deal a hand of plays, read
+You pick one of the Gridiron League's sixteen clubs and call its offense: deal a hand of plays, read
 the defense, throw to a receiver or hand it off, then run for your life. When a drive dies on a tipped interception, you
 spend a **tape token** and rewind the snap — score, clock, stats and all.
 
@@ -57,7 +57,7 @@ publishes it to GitHub Pages when `main` is pushed.
 
 | Hook | What it does |
 | --- | --- |
-| **Your club, your colours** | Start a franchise with any of the eight clubs, each with its own offence, defence and kicking grades, then repaint it in the club editor: city, nickname, abbreviation and all five broadcast colours. The end zone, the jerseys, the HUD bar, the crowd and the badge all follow you. |
+| **Your club, your colours** | Start a franchise with any of the sixteen clubs, each with its own offence, defence and kicking grades, then repaint it in the club editor: city, nickname, abbreviation and all five broadcast colours. The end zone, the jerseys, the HUD bar, the crowd and the badge all follow you. |
 | **Hot routes at the line** | Before the snap you can re-route any receiver who is actually running one, from a five-route menu — `SLANT · OUT · CURL · GO · DRAG`. The defense is already showing its hand, so the choice is the read: `GO` over the top of press coverage, `SLANT` behind a blitz, `CURL` in the soft spot of a zone. The snap count holds while the menu is up, and the route ghost on the field redraws as you pick. The count is 2.8 s, the gold bar under the snap row shows what is left, and touching the field freezes it — so a thumb is never racing a clock. |
 | **The tape deck** | Every game opens with 2–4 rewind tokens. Rewinding undoes the last snap completely. Touchdowns bank another. Running out of tape is the real clock. |
 | **Hype + burst** | Big plays fill a hype meter. Spend 34 hype for a guaranteed broken tackle and a speed spike, or 22 to audible into a fresh hand of play cards. || **Ego and morale** | Stars demand 3+ touches a game. Feed them or the locker room sours, and morale quietly moves catch chances, blocking and training. |
@@ -71,7 +71,7 @@ publishes it to GitHub Pages when `main` is pushed.
 
 ## The season
 
-Eight regular weeks against a seven-team league, top four make the playoffs, then a semifinal and
+Fifteen regular weeks against a fifteen-team league, top four make the playoffs, then a semifinal and
 the Gridiron Bowl. Win or lose, the offseason brings a scouting report: five prospects, one pick,
 and somebody on your roster has to go. Then training camp, tape upgrades, and a new year.
 

@@ -13,11 +13,12 @@ import {
   trainingCost,
   upgradeRewinds,
 } from '../game/season';
-import { QUIRKS, WEATHER } from '../game/data';
+import { QUIRKS, REGULAR_WEEKS, WEATHER } from '../game/data';
 import { audio } from '../game/audio';
 import { haptic, setHapticsEnabled } from '../native';
 import { TeamEditor } from './TeamEditor';
 import { MARKET } from '../game/constants';
+import { careerStage } from '../game/development';
 import {
   buyPrice,
   dealVerdict,
@@ -31,6 +32,7 @@ import {
   type Deal,
 } from '../game/market';
 import {
+  DevTraitChip,
   Empty,
   fmtRecord,
   keyRatings,
@@ -81,10 +83,10 @@ export function HubScreen({
   const opp = opponentForWeek(franchise);
   const totals = seasonTotals(franchise);
   const record = franchise.standings[team.id] ?? { w: totals.wins, l: totals.losses, t: totals.ties };
-  // A tie is a result, not a loss: the last-game strip has to say so, and it only has
-  // the score to go on (the saved summary stores the win flag, not the tie flag).
+  // A tie is a result, not a loss: the saved summary carries its own flag, so the
+  // card never has to guess from the score whether the game was drawn.
   const lastGame = franchise.lastGameSummary;
-  const lastTie = Boolean(lastGame && lastGame.our === lastGame.theirs);
+  const lastTie = Boolean(lastGame && lastGame.tie);
   const standings = useMemo(() => sortedStandings(franchise), [franchise]);
   const trainers = franchise.roster.find((p) => p.id === trainId) ?? null;
   const isOffseason = franchise.seasonStage === 'offseason';
@@ -154,7 +156,8 @@ export function HubScreen({
               {team.city} <span>{team.nickname}</span>
             </h1>
             <p>
-              SEASON {franchise.season} · {isOffseason ? 'OFFSEASON' : `WEEK ${Math.min(franchise.week, 10)}`}
+              SEASON {franchise.season} ·{' '}
+              {isOffseason ? 'OFFSEASON' : `WEEK ${Math.min(franchise.week, franchise.schedule.length)}`}
               {' · '}
               <span className="dim">{franchise.difficulty.toUpperCase()}</span>
             </p>
@@ -203,7 +206,7 @@ export function HubScreen({
               <div className="matchup-side">
                 <TeamBadge team={team} size="md" />
                 <b>{team.abbr}</b>
-                <span>{fmtRecord(record.w, record.l)}</span>
+                <span>{fmtRecord(record.w, record.l, record.t)}</span>
               </div>
               <div className="vs">
                 <span>VS</span>
@@ -273,7 +276,7 @@ export function HubScreen({
                 <span>MORALE</span>
               </div>
               <div>
-                <b>{totals.wins + totals.losses}</b>
+                <b>{totals.wins + totals.losses + totals.ties}</b>
                 <span>GAMES</span>
               </div>
             </div>
@@ -373,9 +376,17 @@ export function HubScreen({
                     >
                       <span className="num">{p.num}</span>
                       <span className="who">
-                        <b>{p.name}</b>
+                        <b>
+                          {p.name}
+                          {p.trait === 'prodigy' && (
+                            <span className="prodigy-star" title="PRODIGY — develops faster than the curve">
+                              {' '}
+                              ★
+                            </span>
+                          )}
+                        </b>
                         <small>
-                          {p.pos} · {QUIRKS[p.quirk]?.name ?? 'NO QUIRK'}
+                          {p.pos} · AGE {p.age} · {QUIRKS[p.quirk]?.name ?? 'NO QUIRK'}
                         </small>
                       </span>
                       <span className="mini-ratings">
@@ -401,7 +412,7 @@ export function HubScreen({
                 <div className="section-head">
                   <h2>SCHEDULE</h2>
                   <span className="dim small">
-                    {record.w}-{record.l}
+                    {fmtRecord(record.w, record.l, record.t)}
                   </span>
                 </div>
                 <div className="schedule-list">
@@ -436,7 +447,7 @@ export function HubScreen({
                     <tr>
                       <th>#</th>
                       <th>TEAM</th>
-                      <th>W-L</th>
+                      <th>W-L-T</th>
                       <th>PF</th>
                       <th>PA</th>
                     </tr>
@@ -504,8 +515,8 @@ export function HubScreen({
                 </div>
               ) : (
                 <p className="muted">
-                  Win games, climb the standings, and finish in the top four after Week 8. Then
-                  it is win-or-go-home football.
+                  Win games, climb the standings, and finish in the top four after Week{' '}
+                  {REGULAR_WEEKS}. Then it is win-or-go-home football.
                 </p>
               )}
             </Panel>
@@ -623,7 +634,12 @@ function TrainingModal({
   const quirk = QUIRKS[player.quirk];
   const stats = Object.keys(RATING_LABELS) as (keyof Ratings)[];
   return (
-    <Modal title={player.name} eyebrow={`${player.pos} · #${player.num} · MORALE ${player.morale}`} onClose={onClose} wide>
+    <Modal
+      title={player.name}
+      eyebrow={`${player.pos} · #${player.num} · AGE ${player.age} ${careerStage(player.age)} · MORALE ${player.morale}`}
+      onClose={onClose}
+      wide
+    >
       <div className="training-head">
         <div className="quirk-card">
           <span className="quirk-icon">{quirk?.icon}</span>
@@ -632,12 +648,18 @@ function TrainingModal({
             <p>{quirk?.desc}</p>
           </div>
         </div>
+        <DevTraitChip player={player} />
+        {player.trait === 'prodigy' && (
+          <div className="prodigy-note">
+            GROWS 60% FASTER IN CAMP · DECLINES AT HALF SPEED · TRAINS FOR 25% LESS TAPE
+          </div>
+        )}
         <div className="tape-wallet">▤ {franchise.tape} TAPE AVAILABLE</div>
       </div>
       <div className="training-grid">
         {stats.map((key) => {
           const value = player.ratings[key];
-          const cost = trainingCost(value);
+          const cost = trainingCost(value, player);
           const maxed = value >= 99;
           return (
             <div className="train-row" key={key}>
@@ -661,7 +683,12 @@ function TrainingModal({
       </div>
       <div className="modal-actions">
         <span className="dim small">
-          {player.ego >= 2 ? 'STAR · wants 3+ touches per game' : 'ROLE PLAYER'} · TRAINING {player.pos}
+          {player.ego >= 2 ? 'STAR · wants 3+ touches per game' : 'ROLE PLAYER'} ·{' '}
+          {player.age <= 24
+            ? 'GROWS EVERY WINTER'
+            : player.age <= 28
+              ? 'IN HIS PRIME'
+              : 'LOSES A STEP EACH WINTER'}
         </span>
         <PixelButton variant="quiet" onClick={onRest} disabled={franchise.tape < 50}>
           TEAM MEETING (50)
@@ -709,8 +736,12 @@ function FilmRoom({ franchise }: { franchise: Franchise }) {
             {franchise.lastGameSummary ? (
               <>
                 <div className="last-score">
-                  <b className={franchise.lastGameSummary.win ? 'win' : 'loss'}>
-                    {franchise.lastGameSummary.win ? 'W' : 'L'}{' '}
+                  <b
+                    className={
+                      franchise.lastGameSummary.win ? 'win' : franchise.lastGameSummary.tie ? 'tie' : 'loss'
+                    }
+                  >
+                    {franchise.lastGameSummary.win ? 'W' : franchise.lastGameSummary.tie ? 'T' : 'L'}{' '}
                     {franchise.lastGameSummary.our}-{franchise.lastGameSummary.theirs}
                   </b>
                   <span>
@@ -740,7 +771,8 @@ function FilmRoom({ franchise }: { franchise: Franchise }) {
             </div>
             {best && (
               <p className="muted small">
-                BEST FINISH: {best.wins}-{best.losses} · SEASON {best.season}
+                BEST FINISH: {best.wins}-{best.losses}
+                {best.ties ? `-${best.ties}` : ''} · SEASON {best.season}
               </p>
             )}
             <div className="history-list">
@@ -1015,9 +1047,17 @@ function MarketModal({
     <div className="cut-row" key={p.id}>
       <span className="num">{p.num}</span>
       <span className="who">
-        <b>{p.name}</b>
+        <b>
+          {p.name}
+          {p.trait === 'prodigy' && (
+            <span className="prodigy-star" title="PRODIGY — develops faster than the curve">
+              {' '}
+              ★
+            </span>
+          )}
+        </b>
         <small>
-          {p.pos} · {overall(p)} OVR · {QUIRKS[p.quirk]?.name ?? 'NO QUIRK'}
+          {p.pos} · AGE {p.age} · {overall(p)} OVR · {QUIRKS[p.quirk]?.name ?? 'NO QUIRK'}
         </small>
       </span>
       <span className={fit === 'BENCH' || fit === 'NEEDED' ? 'market-tag' : 'market-tag on'}>{fit}</span>

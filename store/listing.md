@@ -20,7 +20,7 @@ Tap-first retro football. Call the play, run the rock, rewind the tape.
 ```text
 REWIND BOWL '87 is a tap-first football game played like a lost VHS broadcast.
 
-Pick one of eight clubs, call the offense, and take the field. Read the defense, change a receiver's route at the line, throw him open — or tuck the ball and scramble. When a drive dies on a tipped interception, spend a tape token and rewind the snap. Score, clock, stats and all.
+Pick one of sixteen clubs, call the offense, and take the field. Read the defense, change a receiver's route at the line, throw him open — or tuck the ball and scramble. When a drive dies on a tipped interception, spend a tape token and rewind the snap. Score, clock, stats and all.
 
 CALL THE PLAY
 Four play cards are dealt every down. The defense shows its hand before the snap: a blitz leaves receivers open, a deep shell gives you the underneath. Put a hot route on any receiver — SLANT, OUT, CURL, GO or DRAG — and the route tree redraws on the field.
@@ -32,10 +32,10 @@ REWIND THE TAPE
 Every game opens with a small deck of rewind tokens. Rewinding undoes the last snap completely — the interception, the fumble, the clock. Touchdowns bank another. Running out of tape is the real clock.
 
 BUILD A CLUB
-Eight clubs, each with its own offense, defense and kicking grades. Repaint yours in the club editor: city, nickname, abbreviation and all five broadcast colours. The end zone, jerseys, HUD, crowd and badge follow you.
+Sixteen clubs, each with its own offense, defense and kicking grades. Repaint yours in the club editor: city, nickname, abbreviation and all five broadcast colours. The end zone, jerseys, HUD, crowd and badge follow you.
 
 A FULL SEASON
-Eight regular weeks against a seven-team league. Top four make the playoffs, then the Gridiron Bowl. The offseason brings a scouting report, one draft pick, training camp and a new year. Ratings, quirks, history and titles carry over.
+Fifteen regular weeks against a fifteen-team league. Top four make the playoffs, then the Gridiron Bowl. The offseason brings a scouting report, one draft pick, training camp and a new year. Ratings, quirks, history and titles carry over.
 
 EVERY SNAP HAS A STORY
 Eleven quirks bend the simulation — CANNON, BALLHAWK, IRON MAN, CLUTCH, SHOWTIME and more. Weather changes accuracy, footing and kicking. Stars demand touches; feed them or the locker room sours. The market is open all year: sign a veteran with tape, or sell a man you can spare.
@@ -70,5 +70,5 @@ is the one that shows on the listing until a user swipes.
 ## Release notes — 1.0.0 (1)
 
 ```text
-First release. Eight clubs, a full eight-week season and playoffs, hot routes at the line, quarterback scrambles, tape rewinds, the market, the club editor, and a field that turns sideways with the phone. Offline: no ads, no purchases, no account.
+First release. Sixteen clubs, a full fifteen-week season and playoffs, hot routes at the line, quarterback scrambles, tape rewinds, the market, the club editor, and a field that turns sideways with the phone. Offline: no ads, no purchases, no account.
 ```

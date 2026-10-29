@@ -1,28 +1,11 @@
-import type { Franchise, Player, Pos, Ratings } from './types';
+import type { Franchise, Player, Pos } from './types';
 import { MARKET } from './constants';
 import { Rng } from './rng';
 import { generateFreeAgents } from './season';
 
-// Grade a player the way the market does: a cornerback is not paid for his arm.
-const OVR_KEYS: Record<Pos, (keyof Ratings)[]> = {
-  QB: ['arm', 'hands', 'spd', 'pow'],
-  RB: ['spd', 'pow', 'hands', 'blk'],
-  WR: ['spd', 'hands', 'pow'],
-  SLOT: ['spd', 'hands', 'pow'],
-  TE: ['hands', 'blk', 'pow', 'spd'],
-  OL: ['blk', 'pow'],
-  DL: ['pow', 'tkl', 'spd'],
-  LB: ['tkl', 'cov', 'spd', 'pow'],
-  CB: ['cov', 'spd', 'tkl'],
-  S: ['cov', 'tkl', 'spd'],
-  K: ['arm', 'pow'],
-};
-
-/** The one number the whole market is written in. */
-export function overall(p: Player): number {
-  const keys = OVR_KEYS[p.pos] ?? OVR_KEYS.QB;
-  return Math.round(keys.reduce((a, k) => a + p.ratings[k], 0) / keys.length);
-}
+/** The grade lives in player.ts so the aging curve and the price use one number. */
+import { overall } from './player';
+export { overall };
 
 /** The positions a legal lineup has to be able to field, one man each. */
 export const REQUIRED_POSITIONS: Pos[] = ['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'CB', 'S', 'K'];

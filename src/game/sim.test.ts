@@ -1,8 +1,20 @@
 import assert from 'node:assert/strict';
-import { advanceAfterGame, createFranchise, getTeam, finishGame, playerTeam, startNewSeason, simulateOpponentDrive, trainPlayer, signRookie, upgradeRewinds, type GameSummary } from './season';
+import { advanceAfterGame, createFranchise, endSeason, ensurePlayoffs, generateDraftPool, getTeam, finishGame, makePlayer, playerTeam, seasonTotals, startNewSeason, simulateOpponentDrive, trainingCost, trainPlayer, signRookie, upgradeRewinds, type GameSummary } from './season';
+import {
+  AGE_MAX,
+  AGE_MIN,
+  PRODIGY_DECLINE,
+  PRODIGY_GROWTH,
+  PRODIGY_RATE,
+  RATING_FLOOR,
+  ageSwing,
+  careerStage,
+  developPlayer,
+  developRoster,
+} from './development';
 import { Rng } from './rng';
 import { MAX_OVERTIME_PERIODS, Match } from './match';
-import { TEAMS, WEATHER } from './data';
+import { REGULAR_WEEKS, TEAMS, WEATHER } from './data';
 import {
   ABBR_MAX,
   NAME_MAX,
@@ -241,7 +253,7 @@ assert.ok(avgTd > 0.4, `teams should score touchdowns (avg ${avgTd})`);
 console.log('--- Season progression ---');
 {
   const franchise = createFranchise(2024);
-  for (let week = 1; week <= 8; week++) {
+  for (let week = 1; week <= REGULAR_WEEKS; week++) {
     const weekData = franchise.schedule.find((w) => w.week === franchise.week)!;
     const summary: GameSummary = {
       ourScore: week % 2 === 0 ? 27 : 17,
@@ -279,10 +291,12 @@ console.log('--- Season progression ---');
     if (franchise.seasonStage === 'playoffs') {
       const game = franchise.schedule.find((w) => w.week === franchise.week)!;
       assert.equal(game.stage, 'semi');
+      assert.equal(game.week, REGULAR_WEEKS + 1, 'the semifinal is the week after the regular season');
       // Win the semi and bowl.
       finishGame(franchise, { ...summary, ourScore: 31, theirScore: 21, win: true, opponentId: game.opponentId });
       const bowl = franchise.schedule.find((w) => w.stage === 'bowl');
       assert.ok(bowl, 'winning the semi should schedule the bowl');
+      assert.equal(bowl!.week, REGULAR_WEEKS + 2, 'and the bowl follows the semi');
       finishGame(franchise, { ...summary, ourScore: 28, theirScore: 20, win: true, opponentId: bowl!.opponentId });
       assert.equal(franchise.seasonStage, 'offseason');
       assert.equal(franchise.championId, franchise.teamId);
@@ -308,7 +322,7 @@ console.log('--- Season progression ---');
   assert.equal(next.freeAgents?.length, MARKET.size, 'a new season stocks a fresh wire');
   assert.equal(next.week, 1);
   assert.equal(next.seasonStage, 'regular');
-  assert.equal(next.schedule.length, 8);
+  assert.equal(next.schedule.length, REGULAR_WEEKS);
   assert.ok(Object.keys(next.seasonStats).length === 0);
   console.log('  season history:', JSON.stringify(next.history[0]));
 }
@@ -2451,8 +2465,9 @@ console.log('--- The market ---');
 
 console.log('--- Choosing a club, and editing it ---');
 {
-  // Any of the eight clubs can be the one you coach, and the league schedules around it.
-  for (const pick of ['nyk', 'phx', 'sea']) {
+  // Any of the sixteen clubs can be the one you coach, and the league schedules around it.
+  assert.equal(TEAMS.length, 16, 'the league doubled to sixteen clubs');
+  for (const pick of ['nyk', 'phx', 'sea', 'bos', 'la', 'sd']) {
     const f = createFranchise(77, pick);
     assert.equal(f.teamId, pick, `the franchise belongs to ${pick}`);
     assert.equal(playerTeam(f).id, pick, 'and playerTeam agrees');
@@ -2460,11 +2475,36 @@ console.log('--- Choosing a club, and editing it ---');
       f.schedule.every((w) => w.opponentId !== pick),
       `nobody plays themselves (${pick})`,
     );
-    assert.equal(f.schedule.length, 8, 'an eight-week season');
+    assert.equal(f.schedule.length, REGULAR_WEEKS, 'a fifteen-game season');
+    assert.equal(
+      new Set(f.schedule.map((w) => w.opponentId)).size,
+      REGULAR_WEEKS,
+      'every other club is on the schedule exactly once',
+    );
+    assert.ok(
+      f.schedule.every((w) => w.opponentId !== pick && TEAMS.some((t) => t.id === w.opponentId)),
+      'and every opponent is a real club',
+    );
     assert.equal(Object.keys(f.standings).length, TEAMS.length, 'every club is in the standings');
     assert.ok(f.standings[pick], 'including yours');
     assert.ok(f.roster.length >= 13, 'and you are handed a roster to coach');
   }
+
+  // The postseason moves with the league, not with an old eight-week constant.
+  const bracket = createFranchise(88);
+  bracket.standings[bracket.teamId] = { w: REGULAR_WEEKS, l: 0, t: 0, pf: 420, pa: 180 };
+  ensurePlayoffs(bracket);
+  const semi = bracket.schedule.find((w) => w.stage === 'semi');
+  assert.ok(semi, 'the top seed is given a semifinal');
+  assert.equal(semi!.week, REGULAR_WEEKS + 1, 'the semifinal is week 16');
+  assert.equal(bracket.week, REGULAR_WEEKS + 1, 'and the career is on it');
+  advanceAfterGame(bracket, true, false, 24, 17);
+  const final = bracket.schedule.find((w) => w.stage === 'bowl');
+  assert.ok(final, 'winning it schedules the bowl');
+  assert.equal(final!.week, REGULAR_WEEKS + 2, 'the bowl is week 17');
+  console.log(
+    `  bracket: ${REGULAR_WEEKS} regular weeks → semi week ${REGULAR_WEEKS + 1} → bowl week ${REGULAR_WEEKS + 2}`,
+  );
 
   // The choice reaches the field: the sim dresses both sides in their own colours.
   const chosen = createFranchise(9, 'sea');
@@ -2586,7 +2626,7 @@ console.log('--- Choosing a club, and editing it ---');
     `every preset is a real set of colours (${TEAM_PRESETS.length})`,
   );
   console.log(
-    `  clubs: ${TEAMS.length} to coach, any of them yours · ${TEAM_PRESETS.length} palettes · name cap ${NAME_MAX}, abbr ${ABBR_MAX} · a broken colour changes nothing`,
+    `  clubs: ${TEAMS.length} to coach, any of them yours · ${REGULAR_WEEKS}-game round robin (every rival once) · ${TEAM_PRESETS.length} palettes · name cap ${NAME_MAX}, abbr ${ABBR_MAX} · a broken colour changes nothing`,
   );
   console.log(
     `  editor: renamed a club to MIAMI BEACH STORM (MB) in #ab12cd and it survived a relaunch · nobody else in the league moved`,
@@ -2912,6 +2952,243 @@ console.log('--- Hot routes at the line ---');
 
   console.log(
     `  overtime: Q4 tie → OT1 (${62}s) · scoreless OT → OT2 · decisive 10-7 · cap ${MAX_OVERTIME_PERIODS} periods → walk-off FG · a tied playoff result is refused, not awarded`,
+  );
+}
+
+// A regular-season draw is a tie, not a loss. A 14-14 game that goes to overtime
+// and stays 14-14 is filed as a T for both sides, and the last-game card stores the
+// tie flag instead of leaving the hub to read it out of the score.
+{
+  const forceQuarterEnd = (m: Match) => (m as unknown as { endQuarter: () => void }).endQuarter();
+  const franchise = createFranchise(81);
+  const week = franchise.schedule[0];
+  franchise.week = week.week;
+  const match = new Match({
+    franchise,
+    opponent: getTeam(franchise, week.opponentId),
+    week,
+    weather: WEATHER[week.weather],
+    seed: 5150,
+  });
+  match.begin();
+  match.state.quarter = 4;
+  match.state.clock = 0;
+  match.state.scoreUs = 14;
+  match.state.scoreThem = 14;
+  forceQuarterEnd(match);
+  assert.equal(match.overtimeReady, true, 'a 14-14 fourth quarter offers overtime');
+  match.continueQuarter();
+  assert.equal(match.state.quarter, 5, 'the regular season plays the extra period');
+
+  // Scoreless overtime. The regular season is allowed to end drawn.
+  match.state.clock = 0;
+  forceQuarterEnd(match);
+  assert.equal(match.phase, 'final', 'a scoreless regular-season overtime ends the game');
+  const summary = match.getSummary();
+  assert.equal(summary.win, false);
+  assert.equal(summary.tie, true, '14-14 is a tie, not a loss');
+  assert.equal(summary.ourScore, 14);
+  assert.equal(summary.theirScore, 14);
+
+  finishGame(franchise, summary);
+  assert.equal(week.result?.tie, true, 'the schedule files it as a tie');
+  assert.equal(week.result?.win, false, 'and never as our loss');
+  assert.equal(week.result?.our, 14);
+  assert.equal(week.result?.theirs, 14);
+  const us = franchise.standings[franchise.teamId];
+  const them = franchise.standings[week.opponentId];
+  assert.equal(us.t, 1, 'our standing gets the tie');
+  assert.equal(us.w, 0);
+  assert.equal(us.l, 0, 'and no loss');
+  assert.equal(them.t, 1, 'the opponent gets the tie too');
+  assert.equal(them.w, 0);
+  assert.equal(them.l, 0);
+  const totals = seasonTotals(franchise);
+  assert.equal(totals.ties, 1, 'the season record counts the tie');
+  assert.equal(totals.losses, 0, 'and no loss');
+  assert.equal(franchise.lastGameSummary?.tie, true, 'the last-game card carries the tie flag');
+  assert.equal(franchise.lastGameSummary?.win, false);
+  console.log(
+    `  regular-season tie: 14-14 → OT → still 14-14 → filed T · standings ${us.w}-${us.l}-${us.t} · season ${totals.wins}-${totals.losses}-${totals.ties} · last game ${franchise.lastGameSummary?.tie ? 'T' : 'not a tie'}`,
+  );
+}
+
+// Age is a career clock: 18–40, one birthday per offseason, growth that peaks at
+// 18 and is gone by 28, then decline that starts at 29 and steepens to 40.
+{
+  const franchise = createFranchise(88);
+  const ages = franchise.roster.map((p) => p.age);
+  assert.ok(
+    ages.every((a) => a >= AGE_MIN && a <= AGE_MAX),
+    `every rostered player has a legal age (got ${Math.min(...ages)}–${Math.max(...ages)})`,
+  );
+  const draft = generateDraftPool(new Rng(404), 5);
+  assert.ok(
+    draft.every((p) => p.age >= 18 && p.age <= 22),
+    `draft classes are the youngest in the league (got ${draft.map((p) => p.age).join(',')})`,
+  );
+  assert.ok(
+    (franchise.freeAgents ?? []).every((p) => p.age >= 23 && p.age <= 36),
+    'the wire is veterans, not rookies',
+  );
+
+  const curve = [18, 21, 25, 28, 29, 33, 40].map(ageSwing);
+  assert.ok(
+    curve.every((v, i) => i === 0 || v < curve[i - 1]),
+    `the age curve only turns one way (${curve.join(' → ')})`,
+  );
+  assert.ok(ageSwing(18) >= 4 && ageSwing(18) > ageSwing(22), 'growth is biggest at 18');
+  assert.ok(
+    ageSwing(28) <= 0.2 && ageSwing(29) < 0 && ageSwing(35) < ageSwing(29),
+    'decline starts at 29 and steepens',
+  );
+  assert.equal(careerStage(18), 'ROOKIE');
+  assert.equal(careerStage(30), 'VETERAN');
+  assert.equal(careerStage(38), 'TWILIGHT');
+
+  // One winter on identical bodies: the kid grows, the veteran loses a step.
+  const kid: Player = { ...franchise.roster[0], id: 'kid', age: 18, xp: 0, ratings: flatRatings(70) };
+  const vet: Player = { ...kid, id: 'vet', age: 37 };
+  const kidCamp = developPlayer(kid, new Rng(11));
+  const vetCamp = developPlayer(vet, new Rng(11));
+  assert.equal(kid.age, 19, 'a winter is one birthday');
+  assert.equal(vet.age, 38);
+  assert.ok(kidCamp.delta > 0, `an 18-year-old grows (${kidCamp.delta})`);
+  assert.ok(vetCamp.delta < 0, `a 37-year-old declines (${vetCamp.delta})`);
+  assert.ok(kidCamp.delta > vetCamp.delta, 'the young curve beats the old one');
+
+  // Age cannot run past 40, ratings cannot fall through the floor, and the
+  // fractional part of a winter is banked rather than rounded away.
+  const old = { ...kid, age: AGE_MAX, xp: 0, ratings: flatRatings(RATING_FLOOR + 1) };
+  developPlayer(old, new Rng(2));
+  assert.equal(old.age, AGE_MAX, 'nobody ages past 40');
+  assert.ok(
+    Object.values(old.ratings).every((v) => v >= RATING_FLOOR),
+    'regression stops at the floor instead of gutting a man',
+  );
+  const banker = { ...kid, age: 27, xp: 0.9 };
+  developPlayer(banker, new Rng(9));
+  assert.ok(banker.xp > -1 && banker.xp < 1, 'the fractional winter is banked');
+
+  // Identical states develop identically.
+  const base = createFranchise(92);
+  const copy = JSON.parse(JSON.stringify(base)) as Franchise;
+  developRoster(base);
+  developRoster(copy);
+  assert.deepEqual(base.roster, copy.roster, 'the same roster ages the same way every time');
+  assert.deepEqual(base.development, copy.development);
+
+  // The season layer runs the camp once, after the finale and before the draft.
+  const camp = createFranchise(93);
+  camp.roster.forEach((p) => (p.age = 18));
+  const beforeCamp = camp.roster.reduce((s, p) => s + overall(p), 0);
+  endSeason(camp, false);
+  const afterCamp = camp.roster.reduce((s, p) => s + overall(p), 0);
+  assert.ok(camp.roster.every((p) => p.age === 19), 'every man turns 19');
+  assert.equal(camp.development?.entries.length, camp.roster.length, 'the report covers the whole roster');
+  const campEntries = camp.development?.entries ?? [];
+  assert.ok(
+    (campEntries[0]?.delta ?? 0) >= (campEntries[campEntries.length - 1]?.delta ?? 0),
+    'biggest movers lead the report',
+  );
+  assert.ok(afterCamp > beforeCamp, `an all-18 roster grows in camp (${beforeCamp} → ${afterCamp})`);
+  assert.ok(
+    campEntries.every((e) => e.after === overall(camp.roster.find((p) => p.id === e.id)!)),
+    'the report matches the roster it wrote',
+  );
+
+  const vets = createFranchise(94);
+  vets.roster.forEach((p) => {
+    p.age = 38;
+    p.ratings = flatRatings(70);
+  });
+  const beforeVets = vets.roster.reduce((s, p) => s + overall(p), 0);
+  endSeason(vets, false);
+  const afterVets = vets.roster.reduce((s, p) => s + overall(p), 0);
+  assert.ok(afterVets < beforeVets, `an all-38 roster declines in camp (${beforeVets} → ${afterVets})`);
+  assert.ok(
+    vets.development?.entries.every((e) => e.delta < 0),
+    'every veteran loses a step',
+  );
+
+  const next = startNewSeason(camp);
+  assert.equal(next.development, null, 'the camp report is cleared at week 1');
+  assert.ok(next.roster.every((p) => p.age === 19), 'ages carry into the new season');
+
+  console.log(
+    `  age curve: 18→${ageSwing(18)} · 22→${ageSwing(22)} · 28→${ageSwing(28)} · 29→${ageSwing(29)} · 40→${ageSwing(40)} · kid ${kidCamp.delta > 0 ? '+' : ''}${kidCamp.delta} vs vet ${vetCamp.delta} · all-18 camp ${beforeCamp}→${afterCamp} · all-38 camp ${beforeVets}→${afterVets}`,
+  );
+}
+
+// PRODIGY is the rare career trait: about one player in twelve, and it changes
+// the winter rather than a snap. Faster growth, half-speed decline, cheaper reps.
+{
+  const used = new Set<string>();
+  const sample = Array.from({ length: 400 }, (_, i) =>
+    makePlayer(new Rng(9000 + i), 'WR', 0.5, used),
+  );
+  const stars = sample.filter((p) => p.trait === 'prodigy');
+  const rate = stars.length / sample.length;
+  assert.ok(
+    rate > PRODIGY_RATE - 0.04 && rate < PRODIGY_RATE + 0.04,
+    `the trait is rare but real (${(rate * 100).toFixed(1)}% of ${sample.length})`,
+  );
+  assert.ok(rate < 0.15, 'it never becomes common');
+
+  const a = makePlayer(new Rng(5150), 'QB', 0.4, new Set());
+  const b = makePlayer(new Rng(5150), 'QB', 0.4, new Set());
+  assert.equal(a.name, b.name, 'the same seed still builds the same man');
+  assert.equal(a.trait, b.trait, 'and hands him the same trait');
+
+  const franchise = createFranchise(97);
+  const body = (id: string, age: number, trait: 'prodigy' | null): Player => ({
+    ...franchise.roster[0],
+    id,
+    age,
+    xp: 0,
+    ratings: flatRatings(70),
+    trait,
+  });
+  const points = (p: Player) => Object.values(p.ratings).reduce((a, v) => a + v, 0);
+  const START_POINTS = 7 * 70;
+  const kidPlain = body('plain', 19, null);
+  const kidStar = body('star', 19, 'prodigy');
+  const plainCamp = developPlayer(kidPlain, new Rng(21));
+  const starCamp = developPlayer(kidStar, new Rng(21));
+  assert.ok(
+    points(kidStar) > points(kidPlain),
+    `a prodigy grows faster (${points(kidStar)} vs ${points(kidPlain)} rating points)`,
+  );
+  const vetPlain = body('oldplain', 37, null);
+  const vetStar = body('oldstar', 37, 'prodigy');
+  const oldPlainCamp = developPlayer(vetPlain, new Rng(22));
+  const oldStarCamp = developPlayer(vetStar, new Rng(22));
+  assert.ok(
+    points(vetStar) > points(vetPlain),
+    `and declines at half speed (${points(vetStar)} vs ${points(vetPlain)} rating points)`,
+  );
+
+  const normalCost = trainingCost(70);
+  const starCost = trainingCost(70, body('star2', 19, 'prodigy'));
+  assert.ok(starCost < normalCost, `training is cheaper (▤${starCost} vs ▤${normalCost})`);
+  const camp = createFranchise(98);
+  const kid = camp.roster[0];
+  kid.id = 'star-kid';
+  kid.trait = 'prodigy';
+  kid.ratings.arm = 70;
+  camp.tape = 500;
+  const tapeBefore = camp.tape;
+  assert.ok(trainPlayer(camp, kid.id, 'arm'), 'the prodigy trains');
+  assert.equal(tapeBefore - camp.tape, starCost, 'the discounted price is what leaves the wallet');
+
+  const report = createFranchise(99);
+  report.roster[0].trait = 'prodigy';
+  endSeason(report, false);
+  const flagged = report.development?.entries.find((e) => e.id === report.roster[0].id);
+  assert.equal(flagged?.trait, 'prodigy', 'the camp report keeps the trait');
+
+  console.log(
+    `  prodigy: ${(rate * 100).toFixed(1)}% of ${sample.length} generated players · ×${PRODIGY_GROWTH} camp growth, ×${PRODIGY_DECLINE} decline · 19yo ${points(kidStar) - START_POINTS} vs ${points(kidPlain) - START_POINTS} pts (${starCamp.delta > 0 ? '+' : ''}${starCamp.delta} vs ${plainCamp.delta > 0 ? '+' : ''}${plainCamp.delta} OVR) · 38yo ${points(vetStar) - START_POINTS} vs ${points(vetPlain) - START_POINTS} pts (${oldStarCamp.delta} vs ${oldPlainCamp.delta} OVR) · training ▤${starCost} vs ▤${normalCost}`,
   );
 }
 

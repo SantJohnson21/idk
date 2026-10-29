@@ -32,11 +32,21 @@ export interface Ratings {
   pow: number;
 }
 
+/**
+ * A rare development trait, separate from a quirk: quirks are what a player does
+ * on Sunday, traits decide what he becomes. One in about twelve has PRODIGY.
+ */
+export type DevTrait = 'prodigy';
+
 export interface Player {
   id: string;
   name: string;
   pos: Pos;
   num: number;
+  /** 18–40. One birthday per offseason, and the age decides how a player develops. */
+  age: number;
+  /** Absent on most players; a rare edge that changes the development curve. */
+  trait?: DevTrait | null;
   ratings: Ratings;
   quirk: QuirkId;
   morale: number;
@@ -159,17 +169,38 @@ export interface Franchise {
     /** How far the slow-motion dip on a big moment goes. Independent of shake. */
     slowmo: SlowmoSetting;
   };
+  /** The winter's aging report: kept for the offseason screen, cleared at week 1. */
+  development?: DevelopmentReport | null;
   lastGameSummary?: {
     week: number;
     opponentId: string;
     our: number;
     theirs: number;
     win: boolean;
+    /** Stored, not inferred: a 14-14 draw has to read as a T on every screen. */
+    tie: boolean;
     tapeEarned: number;
     highlights: string[];
     mvp: string;
   } | null;
   soundOn?: boolean;
+}
+
+export interface DevelopmentEntry {
+  id: string;
+  name: string;
+  pos: Pos;
+  age: number;
+  trait?: DevTrait | null;
+  before: number;
+  after: number;
+  delta: number;
+}
+
+/** Every roster's aging pass, written once when a season ends. */
+export interface DevelopmentReport {
+  season: number;
+  entries: DevelopmentEntry[];
 }
 
 export interface GameState {

@@ -65,11 +65,11 @@ Thanks,
 
 ## Release notes — Play Console
 
-Use this exact block for the first closed release. It is **247 characters**
+Use this exact block for the first closed release. It is **251 characters**
 (Play’s limit is 500), including the spaces and punctuation:
 
 ```text
-First release. Eight clubs, a full eight-week season and playoffs, hot routes at the line, quarterback scrambles, tape rewinds, the market, the club editor, and a field that turns sideways with the phone. Offline: no ads, no purchases, no account.
+First release. Sixteen clubs, a full fifteen-week season and playoffs, hot routes at the line, quarterback scrambles, tape rewinds, the market, the club editor, and a field that turns sideways with the phone. Offline: no ads, no purchases, no account.
 ```
 
 The same block is in [`listing.md`](listing.md). If it changes, update both files

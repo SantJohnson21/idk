@@ -2,10 +2,12 @@ import { useState } from 'react';
 import type { Franchise, Player, Ratings } from '../game/types';
 import { getTeam, playerTeam, seasonTotals, signRookie } from '../game/season';
 import { canFieldLineup, overall } from '../game/market';
+import { careerStage } from '../game/development';
 import { QUIRKS } from '../game/data';
 import { audio } from '../game/audio';
 import { haptic } from '../native';
 import {
+  DevTraitChip,
   Empty,
   keyRatings,
   Panel,
@@ -129,6 +131,47 @@ export function OffseasonScreen({
           </div>
         </section>
 
+        {franchise.development && (
+          <Panel className="camp-panel">
+            <div className="section-head">
+              <h2>TRAINING CAMP</h2>
+              <span className="dim small">EVERY MAN TURNS A YEAR OLDER</span>
+            </div>
+            <p className="muted small">
+              Young legs gain the most. The curve flattens around 27, turns at 29, and falls
+              fast after 33.
+            </p>
+            <div className="camp-list">
+              {franchise.development.entries
+                .filter((e) => e.delta !== 0)
+                .slice(0, 8)
+                .map((e) => (
+                  <div className="camp-row" key={e.id}>
+                    <span className="camp-age">{e.age}</span>
+                    <span className="camp-who">
+                      <b>
+                        {e.trait === 'prodigy' ? '★ ' : ''}
+                        {e.name}
+                      </b>
+                      <small>
+                        {e.pos} · {e.before} → {e.after} OVR
+                      </small>
+                    </span>
+                    <span className={`camp-stage ${careerStage(e.age).toLowerCase()}`}>
+                      {careerStage(e.age)}
+                    </span>
+                    <span className={`camp-delta ${e.delta > 0 ? 'up' : 'down'}`}>
+                      {e.delta > 0 ? `+${e.delta}` : e.delta}
+                    </span>
+                  </div>
+                ))}
+            </div>
+            {franchise.development.entries.every((e) => e.delta === 0) && (
+              <Empty text="NOBODY MOVED THIS WINTER" />
+            )}
+          </Panel>
+        )}
+
         {!signed && pool && pool.length > 0 ? (
           <>
             <div className="section-head">
@@ -151,6 +194,9 @@ export function OffseasonScreen({
                     <span className="prospect-ovr">{overall(p)}</span>
                   </div>
                   <h3>{p.name}</h3>
+                  <div className="prospect-age">
+                    AGE {p.age} · {careerStage(p.age)}
+                  </div>
                   <div className="prospect-ratings">
                     {keyRatings(p).map((r) => (
                       <span key={r.key}>
@@ -159,6 +205,7 @@ export function OffseasonScreen({
                     ))}
                   </div>
                   <QuirkChip id={p.quirk} small />
+                  <DevTraitChip player={p} small />
                 </button>
               ))}
             </div>
@@ -173,7 +220,11 @@ export function OffseasonScreen({
                   <div className="draft-prospect-big">
                     <span className="prospect-pos">{selected.pos}</span>
                     <h3>{selected.name}</h3>
+                    <div className="prospect-age">
+                      AGE {selected.age} · {careerStage(selected.age)} · {overall(selected)} OVR
+                    </div>
                     <QuirkChip id={selected.quirk} />
+                    <DevTraitChip player={selected} />
                     <p className="muted small">{QUIRKS[selected.quirk]?.desc}</p>
                     <div className="rating-stack">
                       {(Object.keys(selected.ratings) as (keyof Ratings)[]).map((key) => (
@@ -196,9 +247,17 @@ export function OffseasonScreen({
                         >
                           <span className="num">{p.num}</span>
                           <span className="who">
-                            <b>{p.name}</b>
+                            <b>
+                              {p.name}
+                              {p.trait === 'prodigy' && (
+                                <span className="prodigy-star" title="PRODIGY">
+                                  {' '}
+                                  ★
+                                </span>
+                              )}
+                            </b>
                             <small>
-                              {p.pos} · {overall(p)} OVR · {p.quirk.replace(/_/g, ' ').toUpperCase()}
+                              {p.pos} · AGE {p.age} · {overall(p)} OVR · {careerStage(p.age)}
                             </small>
                           </span>
                           <span className={allowed ? 'dim small' : 'warn small'}>

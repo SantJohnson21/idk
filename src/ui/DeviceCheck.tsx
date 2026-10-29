@@ -64,7 +64,7 @@ export function DeviceCheck({ onClose }: { onClose: () => void }) {
   const career = useMemo(() => {
     const f = loadFranchise();
     if (!f) return 'NO SAVE YET';
-    return `SEASON ${f.season} · WEEK ${Math.min(f.week, 10)} · ${f.tape} TAPE`;
+    return `SEASON ${f.season} · WEEK ${Math.min(f.week, f.schedule.length)} · ${f.tape} TAPE`;
   }, [tick]);
 
   /** What the club editor wrote, read back the way the field reads it. */

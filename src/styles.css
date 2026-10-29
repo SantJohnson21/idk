@@ -1351,6 +1351,10 @@ ul {
   color: var(--red);
 }
 
+.last-score b.tie {
+  color: var(--gold);
+}
+
 .last-score span {
   font-size: 9px;
   color: var(--dim);
@@ -1595,6 +1599,129 @@ ul {
   text-align: right;
 }
 
+/* The winter report: one row per mover. */
+.camp-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.camp-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid #17242e;
+  border-radius: 2px;
+  background: #081016;
+}
+
+.camp-age {
+  width: 22px;
+  flex: none;
+  font-family: var(--pixel);
+  font-size: 8px;
+  color: var(--gold);
+}
+
+.camp-who {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.camp-who b {
+  font-size: 11px;
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.camp-who small {
+  font-size: 8px;
+  color: var(--dim);
+  letter-spacing: 0.04em;
+}
+
+.camp-stage {
+  flex: none;
+  font-size: 7px;
+  letter-spacing: 0.1em;
+  color: #5b7378;
+}
+
+.camp-stage.rookie,
+.camp-stage.rising {
+  color: #5ee6a8;
+}
+
+.camp-stage.prime {
+  color: var(--gold);
+}
+
+.camp-stage.veteran,
+.camp-stage.twilight {
+  color: #ff9d8a;
+}
+
+.camp-delta {
+  width: 24px;
+  flex: none;
+  text-align: right;
+  font-family: var(--pixel);
+  font-size: 9px;
+}
+
+.camp-delta.up {
+  color: #5ee6a8;
+}
+
+.camp-delta.down {
+  color: var(--red);
+}
+
+/* The rare career trait: gold, small, and only there when it is real. */
+.prodigy-star {
+  color: var(--gold);
+  font-size: 9px;
+  letter-spacing: 0;
+  text-shadow: 0 0 8px #ffd16655;
+}
+
+.dev-trait {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  padding: 2px 6px;
+  border: 1px solid #7a5c14;
+  border-radius: 2px;
+  background: linear-gradient(120deg, #2a1e04, #171002);
+  font-family: var(--ui);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--gold);
+  box-shadow: inset 0 0 12px #ffd16622;
+}
+
+.dev-trait.small {
+  padding: 1px 4px;
+  font-size: 8px;
+}
+
+.prodigy-note {
+  padding: 5px 8px;
+  border-left: 2px solid #7a5c14;
+  background: #160f02;
+  font-family: var(--ui);
+  font-size: 8px;
+  line-height: 1.7;
+  letter-spacing: 0.08em;
+  color: #d8b45a;
+}
+
 .prospect-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -1611,6 +1738,12 @@ ul {
   border-radius: 3px;
   background: #0a1218;
   text-align: left;
+}
+
+.prospect-age {
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--dim);
 }
 
 .prospect.selected {

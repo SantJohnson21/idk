@@ -235,7 +235,7 @@ await art.setContent(`<!doctype html>
       <div class="kicker">A TAP-FIRST FOOTBALL STORY</div>
       <div class="logo">REWIND<br>BOWL <b>'87</b></div>
       <div class="tag">CALL THE PLAY. RUN THE ROCK.<br>REWIND THE TAPE.</div>
-      <div class="chips"><span class="chip">8 CLUBS</span><span class="chip">HOT ROUTES</span><span class="chip">QB SCRAMBLE</span><span class="chip">TAPE REWINDS</span></div>
+      <div class="chips"><span class="chip">16 CLUBS</span><span class="chip">HOT ROUTES</span><span class="chip">QB SCRAMBLE</span><span class="chip">TAPE REWINDS</span></div>
     </div>
     <div class="foot">GRIDIRON LEAGUE · SEASON '87</div>
     <div class="stamp">OFFLINE · NO ADS · NO IAP</div>

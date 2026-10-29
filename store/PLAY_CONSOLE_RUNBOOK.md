@@ -20,7 +20,7 @@ uploading.
 | App icon | [`store/icon-512.png`](icon-512.png) exists — **512×512**, 59,662 B |
 | Feature graphic | [`store/feature-graphic-1024x500.png`](feature-graphic-1024x500.png) exists — **1024×500**, 274,162 B |
 | Phone screenshots | six files, all **1080×1920**: [`phone-01-title.png`](screenshots/phone-01-title.png), [`phone-02-clubs.png`](screenshots/phone-02-clubs.png), [`phone-03-hub.png`](screenshots/phone-03-hub.png), [`phone-04-market.png`](screenshots/phone-04-market.png), [`phone-05-ready.png`](screenshots/phone-05-ready.png), [`phone-06-live.png`](screenshots/phone-06-live.png) |
-| Listing limits | App name **15/30**, short description **71/80**, full description **2,284/4,000**, release notes **247/500** characters |
+| Listing limits | App name **15/30**, short description **71/80**, full description **2,292/4,000**, release notes **251/500** characters |
 | Privacy page | [`docs/privacy.html`](../docs/privacy.html) exists (4,066 B) with the contact set to `tronjohnson57@gmail.com`; no placeholder remains |
 | Policy text | [`store/privacy-policy.md`](privacy-policy.md) exists with the same contact in both places |
 | Privacy hosting | [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) publishes [`docs/`](../docs/) to GitHub Pages on pushes to `main`; [`docs/.nojekyll`](../docs/.nojekyll) is present. **Live check 2026-10-29: the repository is public (an anonymous request for <https://github.com/SantJohnson21/idk> returns 200), the workflow was re-run by push `8af69a5` at 06:09 UTC, and fifteen polls from 06:10:39 to 06:13:00 UTC all returned 404 (`Site not found · GitHub Pages`). `actions/configure-pages@v5` still reports `Get Pages site failed: Not Found`, then `Create Pages site failed: Resource not accessible by integration`, so this is a token-permission wall, not a visibility one: only a repository admin can create the Pages site. Do not enter the URL in Play yet — no public HTML URL currently verifies (see FALLBACK).** |
@@ -279,8 +279,8 @@ are:
 
 - App name: **15 characters** (limit 30)
 - Short description: **71 characters** (limit 80)
-- Full description: **2,284 characters** (limit 4,000)
-- Release notes: **247 characters** (limit 500)
+- Full description: **2,292 characters** (limit 4,000)
+- Release notes: **251 characters** (limit 500)
 
 ### Graphics
 
@@ -328,7 +328,7 @@ On the Closed testing page, click **Create new release**.
 2. Upload [`store/rewind-bowl-1.0.0-v1.aab`](rewind-bowl-1.0.0-v1.aab).
 3. Confirm Play reads versionName `1.0.0`, versionCode `1`, target SDK `36`.
 4. Release name: keep `1.0.0 (1)` or use `1.0.0 — first closed test`.
-5. Release notes: paste the 247-character block from
+5. Release notes: paste the 251-character block from
    [`store/closed-test-invite.md`](closed-test-invite.md) (also in
    [`store/listing.md`](listing.md)).
 6. **Save → Review release → Start rollout to Closed testing**.

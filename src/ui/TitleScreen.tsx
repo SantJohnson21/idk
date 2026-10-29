@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Franchise } from '../game/types';
 import { playerTeam, seasonTotals } from '../game/season';
-import { TEAMS } from '../game/data';
+import { REGULAR_WEEKS, TEAMS } from '../game/data';
 import { audio } from '../game/audio';
 import { haptic } from '../native';
 import { APP_VERSION } from '../version';
@@ -80,7 +80,7 @@ export function TitleScreen({
             <b>⚡</b> HYPE BURSTS
           </span>
           <span>
-            <b>★</b> 8-WEEK SEASON
+            <b>★</b> {REGULAR_WEEKS}-WEEK SEASON
           </span>
         </div>
 
@@ -106,7 +106,7 @@ export function TitleScreen({
           <div className="save-line">
             <TeamBadge team={team} size="sm" />
             <span>
-              SEASON {franchise.season} · WEEK {Math.min(franchise.week, 10)} ·{' '}
+              SEASON {franchise.season} · WEEK {Math.min(franchise.week, franchise.schedule.length)} ·{' '}
               {fmtRecord(totals.wins, totals.losses, totals.ties)} · {franchise.tape} TAPE
             </span>
           </div>
@@ -135,7 +135,7 @@ export function TitleScreen({
         >
           <p className="modal-copy">
             Starting a new franchise erases your current save: Season {franchise.season},
-            week {Math.min(franchise.week, 10)}, {franchise.tape} tape,{' '}
+            week {Math.min(franchise.week, franchise.schedule.length)}, {franchise.tape} tape,{' '}
             {franchise.history.filter((h) => h.wonBowl).length} championship
             {franchise.history.filter((h) => h.wonBowl).length === 1 ? '' : 's'}.
           </p>
@@ -159,7 +159,7 @@ export function TitleScreen({
       {pick && (
         <Modal title="CHOOSE YOUR CLUB" eyebrow="NEW FRANCHISE" onClose={() => setPick(false)} wide>
           <p className="modal-copy">
-            Eight clubs, one tape. Whoever you pick is the team you coach — its colours fill the
+            Sixteen clubs, one tape. Whoever you pick is the team you coach — its colours fill the
             end zone, its nickname goes on the box score — and you can repaint the whole thing in
             the club editor once you are in the building.
           </p>
@@ -255,7 +255,7 @@ export function TitleScreen({
               </p>
               <h3>BUILD THE DYNASTY</h3>
               <p>
-                Eight weeks, top four make the playoffs, then the Gridiron Bowl. Earn tape, train
+                {REGULAR_WEEKS} weeks, top four make the playoffs, then the Gridiron Bowl. Earn tape, train
                 players, meet morale demands, and draft a rookie each offseason. Quirks like{' '}
                 <b>SHOWTIME</b>, <b>CANNON</b> and <b>CLUTCH</b> change every snap.
               </p>

@@ -11,9 +11,10 @@ import type {
   TeamInfo,
   WeekSchedule,
 } from './types';
-import { DIFFICULTY_BONUS, FIRST_NAMES, LAST_NAMES, PLAYER_TEAM_ID, TEAMS } from './data';
+import { DIFFICULTY_BONUS, FIRST_NAMES, LAST_NAMES, PLAYER_TEAM_ID, REGULAR_WEEKS, TEAMS } from './data';
 import { prefersReducedMotion } from './motion';
 import { Rng, clamp } from './rng';
+import { developRoster, devTraitFor, PRODIGY_TRAINING } from './development';
 import { MARKET, TUNING } from './constants';
 
 let idCounter = 1;
@@ -164,11 +165,20 @@ export function makePlayer(rng: Rng, pos: Pos, quality: number, usedNames: Set<s
     ratings[key] = clamp(Math.round(rng.range(range[0], range[1]) + bonus), 20, 99);
   }
   const quirk = rng.pick(tpl.pool);
+  const id = nextId();
+  // Draw the name and number in the same order as before so fixed seeds keep
+  // their rosters; the trait is derived from them, not drawn from the stream.
+  const name = pickName(rng, usedNames);
+  const num = rng.int(tpl.min, tpl.max);
   return {
-    id: nextId(),
-    name: pickName(rng, usedNames),
+    id,
+    name,
     pos,
-    num: rng.int(tpl.min, tpl.max),
+    num,
+    // Derived from the id, not the RNG: adding ages must not reshuffle every
+    // roster a fixed seed produces.
+    age: 21 + ((Number.parseInt(id.slice(2), 10) * 7) % 10),
+    trait: devTraitFor(name, pos, num),
     ratings,
     quirk,
     morale: rng.int(62, 82),
@@ -203,8 +213,8 @@ function weatherFor(rng: Rng, week: number): WeekSchedule['weather'] {
 export function makeSchedule(rng: Rng, teamId: string): WeekSchedule[] {
   const opponents = rng.shuffle(TEAMS.filter((t) => t.id !== teamId).map((t) => t.id));
   const weeks: WeekSchedule[] = [];
-  for (let i = 0; i < 8; i++) {
-    const opp = i < 7 ? opponents[i] : rng.pick(opponents);
+  for (let i = 0; i < REGULAR_WEEKS; i++) {
+    const opp = opponents[i];
     weeks.push({
       week: i + 1,
       opponentId: opp,
@@ -307,8 +317,12 @@ export function sortedStandings(franchise: Franchise): { team: TeamInfo; w: numb
   return franchise.teams
     .map((team) => ({ team, ...franchise.standings[team.id] }))
     .sort((a, b) => {
-      const pctA = a.w + a.l === 0 ? 0 : a.w / (a.w + a.l);
-      const pctB = b.w + b.l === 0 ? 0 : b.w / (b.w + b.l);
+      // A tie is half a win, the way the league counts it. Reading only wins and
+      // losses would seed a 0-0-1 team below a 0-1 team.
+      const gamesA = a.w + a.l + a.t;
+      const gamesB = b.w + b.l + b.t;
+      const pctA = gamesA === 0 ? 0 : (a.w + a.t * 0.5) / gamesA;
+      const pctB = gamesB === 0 ? 0 : (b.w + b.t * 0.5) / gamesB;
       if (pctB !== pctA) return pctB - pctA;
       return b.pf - b.pa - (a.pf - a.pa);
     });
@@ -366,10 +380,11 @@ export function ensurePlayoffs(franchise: Franchise): void {
   const bowlB = getTeam(franchise, remaining[1]);
   franchise.bowlOpponentId = simNeutralWin(rng, bowlA, bowlB) ? bowlA.id : bowlB.id;
   franchise.seasonStage = 'playoffs';
-  franchise.week = 9;
-  franchise.schedule = franchise.schedule.filter((w) => w.week < 9);
+  const semiWeek = franchise.schedule.length + 1;
+  franchise.week = semiWeek;
+  franchise.schedule = franchise.schedule.filter((w) => w.week < semiWeek);
   franchise.schedule.push({
-    week: 9,
+    week: semiWeek,
     opponentId,
     home: true,
     weather: 'NIGHT',
@@ -392,15 +407,16 @@ export function advanceAfterGame(franchise: Franchise, win: boolean, tie: boolea
   const rng = new Rng(Date.now() % 65535 + franchise.week * 131 + franchise.season * 17);
   if (week.stage === 'regular') {
     simOtherLeagueGames(franchise, rng, oppId);
-    if (franchise.week < 8) franchise.week += 1;
+    if (franchise.week < franchise.schedule.length) franchise.week += 1;
     else ensurePlayoffs(franchise);
   } else if (week.stage === 'semi') {
     // The bracket reads the scoreline, not the absence of a win flag.
     if (ourScore > theirScore) {
-      franchise.week = 10;
-      franchise.schedule = franchise.schedule.filter((w) => w.week < 10);
+      const bowlWeek = week.week + 1;
+      franchise.week = bowlWeek;
+      franchise.schedule = franchise.schedule.filter((w) => w.week < bowlWeek);
       franchise.schedule.push({
-        week: 10,
+        week: bowlWeek,
         opponentId: franchise.bowlOpponentId ?? franchise.teams.find((t) => t.id !== franchise.teamId)!.id,
         home: true,
         weather: 'NIGHT',
@@ -473,6 +489,9 @@ export function endSeason(franchise: Franchise, wonBowl: boolean): void {
   franchise.seasonStage = 'offseason';
   if (wonBowl) franchise.tape += 250;
   franchise.roster = franchise.roster.map((p) => ({ ...p, morale: clamp(p.morale + 8, 25, 99) }));
+  // Every man turns a year older and pays the age curve — before the draft class
+  // is minted, so this winter's rookies arrive young instead of aged one year.
+  franchise.development = developRoster(franchise);
   franchise.draftPool = generateDraftPool(new Rng(Date.now() % 99991 + franchise.season * 313), 5);
   franchise.week = franchise.schedule.length + 1;
 }
@@ -487,6 +506,8 @@ export function generateDraftPool(rng: Rng, count = 5): Player[] {
     const pos = positions[i % positions.length];
     const p = makePlayer(rng, pos, rng.range(0.45, 0.9), used);
     p.ego = rng.int(1, 2);
+    // Draft classes are 18–22: the youngest players in the league.
+    p.age = 18 + ((Number.parseInt(p.id.slice(2), 10) * 3) % 5);
     pool.push(p);
   }
   return pool;
@@ -511,6 +532,7 @@ export function startNewSeason(franchise: Franchise): Franchise {
     championId: null,
     // A new year has no game tape yet: last season's bowl must not read as "last week".
     lastGameSummary: null,
+    development: null,
     roster: franchise.roster.map((p) => ({ ...p, morale: clamp(p.morale + 6, 30, 99) })),
   };
 }
@@ -519,15 +541,17 @@ export function startNewSeason(franchise: Franchise): Franchise {
 // Training & economy
 // ---------------------------------------------------------------------------
 
-export function trainingCost(rating: number): number {
-  return Math.round(35 + Math.max(0, rating - 55) * 3.2);
+export function trainingCost(rating: number, player?: Player): number {
+  const base = Math.round(35 + Math.max(0, rating - 55) * 3.2);
+  // A prodigy absorbs coaching as quickly as he absorbs a winter.
+  return player?.trait === 'prodigy' ? Math.max(20, Math.round(base * PRODIGY_TRAINING)) : base;
 }
 
 export function trainPlayer(franchise: Franchise, playerId: string, stat: keyof Ratings): boolean {
   const p = franchise.roster.find((x) => x.id === playerId);
   if (!p) return false;
   const cur = p.ratings[stat];
-  const cost = trainingCost(cur);
+  const cost = trainingCost(cur, p);
   if (cur >= 99 || franchise.tape < cost) return false;
   franchise.tape -= cost;
   p.ratings[stat] = Math.min(99, cur + 1);
@@ -582,6 +606,8 @@ export function generateFreeAgents(rng: Rng, count = MARKET.size): Player[] {
     p.level = rng.int(2, 4);
     p.morale = rng.int(55, 78);
     p.ego = rng.int(1, 3);
+    // The wire is veterans: past their rookie deal, short of the retirement watch.
+    p.age = 23 + ((Number.parseInt(p.id.slice(2), 10) * 5) % 14);
     pool.push(p);
   }
   return pool;
@@ -886,6 +912,7 @@ export function finishGame(franchise: Franchise, summary: GameSummary): void {
     our: summary.ourScore,
     theirs: summary.theirScore,
     win: summary.win,
+    tie: summary.tie,
     tapeEarned: summary.tapeEarned,
     highlights: summary.highlights,
     mvp: summary.mvpName,

@@ -208,7 +208,142 @@ export const TEAMS: TeamInfo[] = [
       jersey: '#a78bfa',
     },
   },
+  {
+    id: 'bos',
+    city: 'BOSTON',
+    nickname: 'HARBOR',
+    abbr: 'BOS',
+    off: 79,
+    def: 83,
+    kick: 85,
+    colors: {
+      primary: '#3c7dff',
+      secondary: '#eaf1ff',
+      accent: '#7df9ff',
+      dark: '#071a3a',
+      jersey: '#3c7dff',
+    },
+  },
+  {
+    id: 'det',
+    city: 'DETROIT',
+    nickname: 'MOTORS',
+    abbr: 'DET',
+    off: 75,
+    def: 81,
+    kick: 74,
+    colors: {
+      primary: '#9fb3c8',
+      secondary: '#e6edf5',
+      accent: '#ff4d4d',
+      dark: '#0d141c',
+      jersey: '#9fb3c8',
+    },
+  },
+  {
+    id: 'kc',
+    city: 'KANSAS CITY',
+    nickname: 'CURRENT',
+    abbr: 'KC',
+    off: 83,
+    def: 77,
+    kick: 88,
+    colors: {
+      primary: '#ff3b3b',
+      secondary: '#ffd166',
+      accent: '#fff1c9',
+      dark: '#2a0606',
+      jersey: '#ff3b3b',
+    },
+  },
+  {
+    id: 'la',
+    city: 'LOS ANGELES',
+    nickname: 'VOLT',
+    abbr: 'LA',
+    off: 86,
+    def: 69,
+    kick: 75,
+    colors: {
+      primary: '#c084fc',
+      secondary: '#fde047',
+      accent: '#f0abfc',
+      dark: '#170a26',
+      jersey: '#c084fc',
+    },
+  },
+  {
+    id: 'nsh',
+    city: 'NASHVILLE',
+    nickname: 'NOISE',
+    abbr: 'NSH',
+    off: 73,
+    def: 79,
+    kick: 80,
+    colors: {
+      primary: '#ffcf40',
+      secondary: '#1c1c1c',
+      accent: '#fff3c4',
+      dark: '#141005',
+      jersey: '#ffcf40',
+    },
+  },
+  {
+    id: 'nor',
+    city: 'NEW ORLEANS',
+    nickname: 'HEX',
+    abbr: 'NOR',
+    off: 79,
+    def: 73,
+    kick: 86,
+    colors: {
+      primary: '#9b5de5',
+      secondary: '#00c896',
+      accent: '#e0fbfc',
+      dark: '#160a24',
+      jersey: '#9b5de5',
+    },
+  },
+  {
+    id: 'por',
+    city: 'PORTLAND',
+    nickname: 'PINES',
+    abbr: 'POR',
+    off: 70,
+    def: 85,
+    kick: 78,
+    colors: {
+      primary: '#2f9e44',
+      secondary: '#f8f4e3',
+      accent: '#b2f2bb',
+      dark: '#07180a',
+      jersey: '#2f9e44',
+    },
+  },
+  {
+    id: 'sd',
+    city: 'SAN DIEGO',
+    nickname: 'BREAKERS',
+    abbr: 'SD',
+    off: 81,
+    def: 75,
+    kick: 82,
+    colors: {
+      primary: '#38bdf8',
+      secondary: '#fb7185',
+      accent: '#fde68a',
+      dark: '#062334',
+      jersey: '#38bdf8',
+    },
+  },
 ];
+
+/**
+ * Sixteen clubs, one round robin: every club plays every other club once.
+ * The schedule and the postseason both read this, so adding a club lengthens
+ * the season instead of leaving somebody off the fixture list.
+ */
+export const REGULAR_WEEKS = TEAMS.length - 1;
 
 export const PLAYER_TEAM_ID = 'mia';
 

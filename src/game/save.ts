@@ -3,6 +3,7 @@ import { TEAMS } from './data';
 import { prefersReducedMotion } from './motion';
 import { syncIdCounter } from './season';
 import { ensureMarket } from './market';
+import { devTraitFor } from './development';
 
 const KEY = 'rewind-bowl-save-v1';
 
@@ -28,6 +29,10 @@ export function loadFranchise(): Franchise | null {
     f.draftPool = f.draftPool ?? null;
     f.freeAgents = f.freeAgents?.length ? f.freeAgents : null;
     f.lastGameSummary = f.lastGameSummary ?? null;
+    // Saves from before the tie flag existed carry only the score; fill it in.
+    if (f.lastGameSummary && typeof f.lastGameSummary.tie !== 'boolean') {
+      f.lastGameSummary.tie = f.lastGameSummary.our === f.lastGameSummary.theirs;
+    }
     f.tape = Number.isFinite(f.tape) ? f.tape : 100;
     f.rewindLevel = Number.isFinite(f.rewindLevel) ? f.rewindLevel : 0;
     f.difficulty = f.difficulty ?? 'pro';
@@ -46,7 +51,20 @@ export function loadFranchise(): Franchise | null {
       ...p,
       morale: Number.isFinite(p.morale) ? p.morale : 70,
       ego: Number.isFinite(p.ego) ? p.ego : 1,
+      // Saves from before players had an age get a late-twenties veteran, so a
+      // loading roster is not all 18-year-olds on the first winter.
+      age: Number.isFinite(p.age)
+        ? Math.min(40, Math.max(18, Math.round(p.age)))
+        : 22 + ((Number.parseInt(p.id.replace(/^pl/, ''), 10) * 5) % 12),
+      // A save from before traits existed gets the trait his own name would earn,
+      // so an old franchise still has prodigies on the roster.
+      trait: p.trait ?? devTraitFor(p.name, p.pos, p.num),
     }));
+    // Development arrived after the first saves; a missing report is simply no camp news.
+    f.development = f.development ?? null;
+    if (f.development) {
+      f.development.entries = f.development.entries ?? [];
+    }
     // Mint nothing until our id counter is past every id in the save, then stock the
     // wire for a save written before the market existed.
     syncIdCounter(f);

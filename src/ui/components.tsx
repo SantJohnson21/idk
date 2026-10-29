@@ -172,6 +172,19 @@ export function QuirkChip({ id, small }: { id: Player['quirk']; small?: boolean 
   );
 }
 
+/** The rare career trait, shown only when a player actually has it. */
+export function DevTraitChip({ player, small }: { player: Player; small?: boolean }) {
+  if (player.trait !== 'prodigy') return null;
+  return (
+    <span
+      className={`dev-trait ${small ? 'small' : ''}`}
+      title="PRODIGY — grows 60% faster in camp, declines at half speed, trains for 25% less tape"
+    >
+      ★ PRODIGY
+    </span>
+  );
+}
+
 export function MoraleMeter({ value }: { value: number }) {
   const color = value >= 80 ? '#5ee6a8' : value >= 55 ? '#ffd166' : '#ff6b7a';
   const face = value >= 80 ? '☺' : value >= 55 ? '•' : '☹';
