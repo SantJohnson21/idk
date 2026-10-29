@@ -54,7 +54,7 @@ The whole game is on the device. Saves are local: uninstalling the app erases th
 - **Tags:** Football, Sports, Retro, Pixel art, Single player, Offline
 - **Contact email:** `tronjohnson57@gmail.com`
 - **Website:** optional
-- **Privacy policy:** `https://raw.githack.com/SantJohnson21/idk/main/docs/privacy.html` — interim verified-live Play URL: GET **200**, `text/html; charset=utf-8`, 3,870 B on 2026-10-29 (HEAD is 403 because the CDN rejects HEAD). Canonical/preferred: `https://santjohnson21.github.io/idk/privacy.html`, still **404** until **Settings → Pages → Source: GitHub Actions** is set. Do not use `raw.githubusercontent.com`; it is `text/plain`. See the runbook.
+- **Privacy policy:** `https://santjohnson21.github.io/idk/privacy.html` — canonical Play URL; it must return HTTP 200 before you enter it, and the 2026-10-29 check is still 404 (see the runbook)
 
 ## Graphics map
 

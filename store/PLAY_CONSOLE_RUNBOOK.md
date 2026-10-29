@@ -23,14 +23,14 @@ uploading.
 | Listing limits | App name **15/30**, short description **71/80**, full description **2,284/4,000**, release notes **247/500** characters |
 | Privacy page | [`docs/privacy.html`](../docs/privacy.html) exists (3,870 B) with the contact set to `tronjohnson57@gmail.com`; no placeholder remains |
 | Policy text | [`store/privacy-policy.md`](privacy-policy.md) exists with the same contact in both places |
-| Privacy hosting | **Interim verified-live Play URL:** [raw.githack](https://raw.githack.com/SantJohnson21/idk/main/docs/privacy.html) — GET **200**, `text/html; charset=utf-8`, **3,870 B** on 2026-10-29; HEAD **403** because the CDN rejects HEAD. **Canonical/preferred:** `https://santjohnson21.github.io/idk/privacy.html` — **404** until the one-time **Settings → Pages → Source: GitHub Actions** step. The Pages workflow is committed and correct. |
+| Privacy hosting | [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) publishes [`docs/`](../docs/) to GitHub Pages on pushes to `main`; [`docs/.nojekyll`](../docs/.nojekyll) is present. **Live check 2026-10-29: the canonical URL returns 404 (“Site not found”); the workflow’s authenticated `configure-pages` step reports `Get Pages site failed: Not Found` and cannot create the site (`Resource not accessible by integration`). The public Pages API is rate-limited from this sandbox (403). Do not enter the URL in Play yet — the browser check in FALLBACK shows no public HTML URL currently verifies.** |
 | Declarations file | [`store/data-safety.md`](data-safety.md) exists |
 | Merged permissions | `android.permission.INTERNET`, `android.permission.VIBRATE`, and the app-defined `com.rewindbowl.game.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` — **no `AD_ID`**, no location, camera, microphone, contacts, storage or notification permission |
 | Ads / analytics | No ads or analytics dependencies in [`package.json`](../package.json); `google-services.json` is absent; source search finds no AdMob/AdSense/AppLovin/Unity Ads/IronSource/Firebase/AppsFlyer/Adjust/Sentry/Bugsnag/Segment/Mixpanel/PostHog usage |
 | Network calls | No `fetch`, `XMLHttpRequest`, `WebSocket`, `sendBeacon`, `axios` or `http(s)://` call sites in `../src`, `../index.html` or `../capacitor.config.ts` |
 | Release hardening | AAB application has `allowBackup="false"` and `usesCleartextTraffic="false"` |
 | Upload key | [`android/rewind-bowl-upload.jks`](../android/rewind-bowl-upload.jks) and [`android/keystore.properties`](../android/keystore.properties) exist (gitignored; do not commit or share) |
-| Not verified | No device/emulator install, no testers, no Play upload, no review, no hardware run, and no Pages deployment — the canonical privacy URL is still 404; the interim CDN URL is GET-verified |
+| Not verified | No device/emulator install, no testers, no Play upload, no review, no hardware run, and no Pages deployment — the privacy URL is still 404 |
 
 How those checks were made:
 
@@ -60,27 +60,25 @@ user-data permission.
   internal and not a data permission.
 - The release build disables cleartext traffic and Android backup.
 
-## Interim URL and Pages fallback
+## FALLBACK — if the privacy URL is still 404
 
-**Verified 2026-10-29.**
+**Status checked 2026-10-29.** `https://santjohnson21.github.io/idk/privacy.html`
+returns **404** (“Site not found”). The public Pages API reads are currently
+blocked by this sandbox IP’s unauthenticated rate limit: **403**,
+`API rate limit exceeded` (reset 06:39 UTC). The authenticated workflow output is
+the useful signal: `actions/configure-pages@v5` reports `Get Pages site failed:
+Not Found`, then `Create Pages site failed: Resource not accessible by
+integration`. Both runs (`40817742903`, `40824702390`) fail at that step.
 
-- **Interim Play URL:** `https://raw.githack.com/SantJohnson21/idk/main/docs/privacy.html`
-  — GET **200**, `text/html; charset=utf-8`, **3,870 bytes**; the body contains
-  `Nothing leaves`, the contact email and both `mailto:` links. Pinned audit
-  URL: `https://raw.githack.com/SantJohnson21/idk/78fa54a1a366289f7c0d9056f6491ca062f22bda/docs/privacy.html`
-  — same **200** / **3,870** / `text/html`. `@main` is cached with
-  `cache-control: max-age=60, private` (x-cache HIT/MISS), so a policy edit can
-  take about a minute to appear; the pinned form is immutable.
-  **Caveat:** `HEAD` returns **403** at this CDN; the GET is the verified path.
-  This is an **interim verified-live URL, canonical URL pending one manual click**.
-- **Canonical/preferred:** `https://santjohnson21.github.io/idk/privacy.html`
-  — **404** (“Site not found”, 9,115 B). The workflow is correct, but the Pages
-  site is not enabled. Both runs (`40817742903`, `40824702390`) fail at
-  `actions/configure-pages@v5` with `Get Pages site failed: Not Found` and then
-  `Create Pages site failed: Resource not accessible by integration`.
-- **API evidence:** `GET /repos/SantJohnson21/idk/pages` is **403** (the sandbox
-  IP is unauthenticated and rate-limited; reset 06:39 UTC);
-  `GET /repos/SantJohnson21/idk/pages/builds/latest` is **404 Not Found**.
+**Browser check 2026-10-29 (412×892):** the claimed interim
+`raw.githack.com/.../privacy.html` returns **200 text/html**, but Chromium gets
+`External Content Notice | rawgit.hack` with one `mailto:admin@githack.com` and no
+policy content. `cdn.jsdelivr.net` and `cdn.statically.io` serve the policy as
+`text/plain`. `htmlpreview.github.io` is a 1,269-byte JavaScript wrapper with no
+policy text in the served HTML. **No public HTML URL currently verifies**; keep
+the canonical URL pending. When the policy is rendered through that preview
+wrapper, the 412 px layout has no horizontal overflow and both mailto links
+work, but the inline links measure only 15 px and 19 px tall.
 
 The missing credential is a **repo-admin user token**. This sandbox has none: no
 `GH_TOKEN`/`GITHUB_TOKEN`, `gh auth status` is logged out, no
@@ -107,11 +105,13 @@ write** plus **Administration: Read and write** for this repository. A `201`
 means created; `409` means it already exists. Then re-run the workflow. Do not
 use the Actions `GITHUB_TOKEN`.
 
-**Raw audit fallback (not Play-facing):**
+**Fallback URL while blocked:**
 <https://raw.githubusercontent.com/SantJohnson21/idk/main/docs/privacy.html>
-returns **200**, `text/plain; charset=utf-8`, 3,870 bytes. It is not a substitute
-for the Play-facing HTML page; use the interim CDN URL until the canonical Pages
-site is enabled.
+returns **200**, `text/plain; charset=utf-8`, 3,870 bytes, and contains the
+contact plus both `mailto:` links. It is not a substitute for the Play-facing
+page: Play expects a browser-readable policy page, and raw text is not the
+canonical `github.io` page. Do not enter the raw URL in Play; keep the canonical
+URL pending until it returns 200.
 
 ## Before screen 1
 
@@ -128,20 +128,20 @@ Have these ready:
 | App bundle | [`store/rewind-bowl-1.0.0-v1.aab`](rewind-bowl-1.0.0-v1.aab) |
 | Listing copy | [`store/listing.md`](listing.md) |
 | App content answers | [`store/data-safety.md`](data-safety.md) |
-| Privacy page | [`docs/privacy.html`](../docs/privacy.html) — contact set; served by the interim CDN, canonical Pages page pending |
-| Privacy URL | `https://raw.githack.com/SantJohnson21/idk/main/docs/privacy.html` — interim verified-live (GET **200**, `text/html`; HEAD **403** at the CDN). Canonical: `https://santjohnson21.github.io/idk/privacy.html` (still **404**, pending one manual click) |
+| Privacy page | [`docs/privacy.html`](../docs/privacy.html) — contact set; publish it with the Pages workflow before entering the URL |
+| Privacy URL | `https://santjohnson21.github.io/idk/privacy.html` — canonical Play URL; **currently 404, so do not enter it until it returns 200** |
 | Icon | [`store/icon-512.png`](icon-512.png) |
 | Feature graphic | [`store/feature-graphic-1024x500.png`](feature-graphic-1024x500.png) |
 | Screenshots | the six files under [`store/screenshots/`](screenshots/) |
 
 **Privacy hosting:** the contact placeholder is gone; both the page and
-`store/privacy-policy.md` use `tronjohnson57@gmail.com`. The interim URL is
-`https://raw.githack.com/SantJohnson21/idk/main/docs/privacy.html` — GET **200**,
-`text/html; charset=utf-8`, 3,870 B on 2026-10-29, containing the policy and both
-`mailto:` links. HEAD is **403** because that CDN rejects HEAD, so treat it as an
-interim verified-live URL, not a perfect host. The canonical
-`https://santjohnson21.github.io/idk/privacy.html` is still **404**; see
-**Interim URL and Pages fallback** below for the one manual click.
+`store/privacy-policy.md` use `tronjohnson57@gmail.com`. The Pages workflow is
+committed, but the site is not enabled: on 2026-10-29 the canonical URL returned
+**404**. The public Pages API is rate-limited from this sandbox (**403**, reset
+06:39 UTC); the workflow’s authenticated `configure-pages` step reports
+`Get Pages site failed: Not Found` and `Create Pages site failed: Resource not
+accessible by integration`. Do not submit App content with this URL until it
+returns 200. See **FALLBACK** below for the one-time fix.
 
 **Signing:** the AAB is signed with the upload key in
 `android/rewind-bowl-upload.jks`. Keep that file and `android/keystore.properties`
@@ -191,11 +191,9 @@ Play Console → **Policy and programs → App content** (some accounts label it
 
 ### Privacy policy
 
-Paste the interim URL
-`https://raw.githack.com/SantJohnson21/idk/main/docs/privacy.html` — GET **200**,
-`text/html`, 3,870 B on 2026-10-29. The canonical
-`https://santjohnson21.github.io/idk/privacy.html` is still **404** until the
-one-time Pages step; switch to it once it returns 200.
+Paste `https://santjohnson21.github.io/idk/privacy.html` only after it returns
+200. The Pages workflow is committed, but the 2026-10-29 live check is still
+**404**; enable Pages first (see “Privacy hosting” above).
 
 ### App access
 
@@ -280,7 +278,7 @@ Upload the screenshots in that order. They are 1080×1920 (9:16), inside Play’
 - **Tags:** Football, Sports, Retro, Pixel art, Single player, Offline
 - **Contact email:** `tronjohnson57@gmail.com`
 - **Website:** optional
-- **Privacy policy:** `https://raw.githack.com/SantJohnson21/idk/main/docs/privacy.html` — interim verified-live (GET **200**, `text/html`; HEAD **403** at the CDN). Canonical: `https://santjohnson21.github.io/idk/privacy.html` (still **404**, pending one manual click).
+- **Privacy policy:** `https://santjohnson21.github.io/idk/privacy.html`
 
 ### Pricing and distribution
 
@@ -434,7 +432,7 @@ code `1`.
 | Closed testing page is locked | Finish the Dashboard/App content setup first. |
 | “Apply for production” is greyed out | Fewer than 12 testers opted in, fewer than 14 continuous days, or app setup is incomplete. |
 | Testers see “Item not found” | Wrong Google account, not on the email list, wrong country, or the release is not rolled out. |
-| Privacy policy URL invalid | If using the canonical URL, the 2026-10-29 check is 404 because Pages is not enabled. Use the interim CDN URL above, or set **Settings → Pages → Source: GitHub Actions**, re-run the workflow, and switch once the canonical URL returns 200. |
+| Privacy policy URL invalid | The 2026-10-29 live check is still 404, so Pages is not enabled. Set **Settings → Pages → Source: GitHub Actions**, re-run the workflow, and confirm the URL returns 200. |
 | Store listing asks for a contact email | Enter `tronjohnson57@gmail.com` in Store settings. |
 | Upload rejects the AAB as “not compatible” | Confirm the package is `com.rewindbowl.game` and the file is the AAB, not the debug APK. |
 
