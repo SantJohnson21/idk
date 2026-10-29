@@ -50,7 +50,7 @@ user-data permission.
 ### What that means for declarations
 
 - **Data safety:** no data collected, no data shared. The only persistence is the
-  local `localStorage` career save; it never leaves the device.
+  local `localStorage` career saves (four slots); they never leave the device.
 - **Advertising ID:** answer **No**. There is no `AD_ID` permission and no ads or
   analytics SDK.
 - **Permissions:** do not write “the app requests no permissions.” It requests
@@ -254,8 +254,8 @@ Families; that adds design and ads requirements the game does not need.
 | Does your app share data with third parties? | **No** |
 | Does your app use advertising or analytics SDKs? | **No** |
 
-The local career save is not “collection” because it stays on the device and is
-not sent to the developer or any third party.
+The local career saves are not “collection” because they stay on the device and
+are not sent to the developer or any third party.
 
 ### Other declarations
 

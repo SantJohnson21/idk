@@ -201,6 +201,14 @@ toggleable, and the save hydrates defensively so an old save keeps working.
 - Nothing here is cosmetic-only: the end zone, jerseys, HUD bar, crowd flecks, badge, hero and box
   score all read from the same five colours, so a repaint is visible on the very next snap.
 
+### 5.9 Four tapes
+
+Four save slots, each a separate `localStorage` key and a complete career: club, season, roster,
+history and tape. The title card shows all four, marks the active tape, and can switch, start into an
+empty slot or erase one after a confirmation. A single save from the first builds migrates into slot
+1 once, and the active slot is restored on launch. The slot picker never hydrates or mutates a tape
+it is only displaying.
+
 ## 6. Controls and UX
 
 Portrait first, one thumb, tap-first — and the same game re-framed in landscape:
@@ -262,8 +270,8 @@ the second level on runs. Without those four, every handoff died at the line of 
 
 - No defense control, no play creator, no trades, no bidding wars — the market is a fixed price
   list, not an auction — and no multiplayer.
-- No account, no server, no monetisation loop. A franchise lives in `localStorage` and can be
-  resumed from the title screen.
+- No account, no server, no monetisation loop. Four franchises live in four `localStorage`
+  slots; the title card remembers the active tape and can switch or erase any of them.
 
 ## 10. Next steps
 

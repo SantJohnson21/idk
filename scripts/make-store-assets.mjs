@@ -113,7 +113,7 @@ console.log(
   (await page.locator('.matchup').innerText()).replace(/\s+/g, ' '),
   '·',
   await page.evaluate(() => {
-    const f = JSON.parse(localStorage.getItem('rewind-bowl-save-v1'));
+    const f = JSON.parse(localStorage.getItem('rewind-bowl-save-v1-slot-0'));
     return `week ${f.week} · ${f.schedule.find((w) => w.week === f.week)?.opponentId}`;
   }),
 );
@@ -133,7 +133,7 @@ await page.locator('.play-card').first().waitFor({ timeout: 20_000 });
 console.log(
   '  game:',
   await page.evaluate(() => {
-    const f = JSON.parse(localStorage.getItem('rewind-bowl-save-v1'));
+    const f = JSON.parse(localStorage.getItem('rewind-bowl-save-v1-slot-0'));
     return `week ${f.week} · ${f.schedule.find((w) => w.week === f.week)?.opponentId}`;
   }),
 );

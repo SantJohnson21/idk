@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Franchise } from './game/types';
 import { createFranchise, finishGame, startNewSeason, type GameSummary } from './game/season';
 import { audio } from './game/audio';
-import { loadFranchise, saveFranchise } from './game/save';
+import { activeSlot, clearSave, loadFranchise, saveFranchise, setActiveSlot } from './game/save';
 import { bootNative, exitApp, onBackButton, reportBack, setHapticsEnabled } from './native';
 import { TitleScreen } from './ui/TitleScreen';
 import { HubScreen } from './ui/HubScreen';
@@ -16,6 +16,7 @@ type View = 'title' | 'hub' | 'game' | 'offseason';
 const clone = <T,>(v: T): T => JSON.parse(JSON.stringify(v)) as T;
 
 export default function App() {
+  const [slot, setSlot] = useState(() => activeSlot());
   const [franchise, setFranchise] = useState<Franchise | null>(() => loadFranchise());
   const [view, setView] = useState<View>('title');
   const [gameKey, setGameKey] = useState(0);
@@ -29,8 +30,8 @@ export default function App() {
   const wasHidden = useRef(false);
 
   useEffect(() => {
-    if (franchise) saveFranchise(franchise);
-  }, [franchise]);
+    if (franchise) saveFranchise(franchise, slot);
+  }, [franchise, slot]);
 
   useEffect(() => {
     if (!franchise) return;
@@ -128,13 +129,36 @@ export default function App() {
     });
   }, []);
 
-  const startNew = (teamId?: string) => {
+  const startNew = (teamId?: string, targetSlot = slot) => {
     const f = createFranchise(Date.now(), teamId);
+    setActiveSlot(targetSlot);
+    setSlot(targetSlot);
     setFranchise(f);
-    saveFranchise(f);
+    saveFranchise(f, targetSlot);
     setView('hub');
     audio.init();
     audio.play('kickoff');
+  };
+
+  const loadSlot = (targetSlot: number) => {
+    const loaded = loadFranchise(targetSlot);
+    if (!loaded) return;
+    finishedRef.current = false;
+    setActiveSlot(targetSlot);
+    setSlot(targetSlot);
+    setFranchise(loaded);
+    setView('hub');
+    audio.init();
+    audio.play('select');
+  };
+
+  const deleteSlot = (targetSlot: number) => {
+    clearSave(targetSlot);
+    if (targetSlot === slot) {
+      finishedRef.current = false;
+      setFranchise(null);
+      setView('title');
+    }
   };
 
   const startGame = () => {
@@ -149,7 +173,7 @@ export default function App() {
     const next = clone(franchise);
     finishGame(next, summary);
     setFranchise(next);
-    saveFranchise(next);
+    saveFranchise(next, slot);
     setView(next.seasonStage === 'offseason' ? 'offseason' : 'hub');
   };
 
@@ -157,7 +181,7 @@ export default function App() {
     if (!franchise) return;
     const next = startNewSeason(franchise);
     setFranchise(next);
-    saveFranchise(next);
+    saveFranchise(next, slot);
     setView('hub');
   };
 
@@ -166,8 +190,11 @@ export default function App() {
       {view === 'title' && (
         <TitleScreen
           franchise={franchise}
+          activeSlot={slot}
           onContinue={() => setView('hub')}
           onNew={startNew}
+          onLoadSlot={loadSlot}
+          onDeleteSlot={deleteSlot}
         />
       )}
       {view === 'hub' && franchise && (

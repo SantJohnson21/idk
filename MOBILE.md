@@ -23,7 +23,7 @@ scripts/release-record.mjs  stamps the generated build record in this file
 | Orientation | Portrait and landscape on both platforms. The game re-frames the field and tape deck in place; rotation never reloads a drive. |
 | Haptics | `src/native.ts` maps play events to cues — selection tick for every menu button, tab and list row as well as play cards; light taps for the snap, the throw and the quarterback's take-off; medium for a catch and a tackle; a two-stage burst on a broken tackle; success and error patterns for points and turnovers; a heavy thud on a blocked punt; two-stage heavy rewind — via Taptic Engine impacts and notifications (iOS included), with `navigator.vibrate` patterns as the browser fallback. The full vocabulary and what each cue should feel like on hardware is DEVICE-CHECK.md §B. |
 | Back button | Android back steps title ⇄ hub, pauses a live game, and quits from the title screen. |
-| Saves | Still `localStorage`. Persists across launches, dies on uninstall. |
+| Saves | Four `localStorage` slots, each with its own career and an active-slot key. Persists across launches, dies on uninstall. |
 | Network | None. The app is fully offline. |
 
 ## Prerequisites

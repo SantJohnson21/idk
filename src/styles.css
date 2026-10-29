@@ -555,6 +555,123 @@ ul {
   color: #b9cbd2;
 }
 
+.title-cta-quiet {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+}
+
+.title-cta-quiet .pbtn {
+  flex: 1 1 auto;
+}
+
+/* ---------------------------------------------------------- save slots --- */
+
+.save-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.save-slot {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: #081016;
+  text-align: left;
+}
+
+.save-slot.active {
+  border-color: var(--gold);
+  background: #1b1404;
+  box-shadow: 0 0 0 1px #ffd16655;
+}
+
+.save-slot.empty {
+  border-style: dashed;
+  background: #070d12;
+}
+
+.save-slot-id {
+  flex: 0 0 46px;
+  font-family: var(--ui);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  color: var(--dim);
+}
+
+.save-slot.active .save-slot-id {
+  color: var(--gold);
+}
+
+.save-slot-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.save-slot-body b {
+  overflow: hidden;
+  font-family: var(--pixel);
+  font-size: 9px;
+  font-weight: 400;
+  color: #f4f0dc;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.save-slot-body small {
+  font-family: var(--ui);
+  font-size: 8px;
+  letter-spacing: 0.05em;
+  line-height: 1.45;
+  color: var(--dim);
+}
+
+.save-slot-body.empty b {
+  color: var(--dim);
+}
+
+.save-slot-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+}
+
+.save-slot-live {
+  font-family: var(--ui);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+}
+
+.save-slot-trash {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #4b2029;
+  border-radius: 3px;
+  background: #190b0f;
+  color: #ff8090;
+  font-family: var(--ui);
+  font-size: 11px;
+  line-height: 1;
+}
+
+.save-slot-trash:active {
+  transform: scale(0.94);
+}
+
 .title-foot {
   position: relative;
   z-index: 2;
@@ -3801,6 +3918,9 @@ ul {
     min-height: 34px;
     padding: 9px 12px;
     font-size: 9px;
+  }
+  .title-cta-quiet {
+    gap: 2px;
   }
   .title-cta .btn-xl {
     font-size: 10px;

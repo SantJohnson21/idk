@@ -8,8 +8,8 @@ and `src/`: the merged manifest declares `INTERNET`, `VIBRATE` and the app-defin
 `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`; it has no `AD_ID`, location, camera,
 microphone, contacts, storage or notification permission. `package-lock.json`
 and the app source contain no ads/analytics SDK and no `fetch`, `XMLHttpRequest`,
-`WebSocket`, `sendBeacon` or `axios` calls. The only persistence is the local
-`localStorage` career save. `INTERNET` is the Capacitor WebView default; no app
+`WebSocket`, `sendBeacon` or `axios` calls. The only persistence is up to four local
+`localStorage` career saves (four save slots). `INTERNET` is the Capacitor WebView default; no app
 code makes an external request, so it does not change the Data safety answer.
 
 ## Data safety
@@ -23,8 +23,9 @@ code makes an external request, so it does not change the Data safety answer.
 | Does your app share data with third parties? | **No** |
 | Does your app use advertising or analytics SDKs? | **No** |
 
-Why: the game is a static web bundle in a WebView. The career is a single
-`localStorage` key on the device. There are no network requests after the bundle
+Why: the game is a static web bundle in a WebView. Each career is a `localStorage`
+key on the device; the game supports four save slots and stores no more than four
+careers. There are no network requests after the bundle
 loads, no accounts, no crash reporter, no attribution SDK and no ads.
 
 ## Ads

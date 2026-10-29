@@ -1,16 +1,99 @@
-import type { Franchise } from './types';
+import type { Franchise, TeamInfo } from './types';
 import { TEAMS } from './data';
 import { prefersReducedMotion } from './motion';
 import { syncIdCounter } from './season';
 import { ensureMarket } from './market';
 import { devTraitFor } from './development';
 
-const KEY = 'rewind-bowl-save-v1';
+/** Four tapes, four careers. The slot is part of the key, not a field in the save. */
+export const SAVE_SLOTS = 4;
 
-export function loadFranchise(): Franchise | null {
+const LEGACY_KEY = 'rewind-bowl-save-v1';
+const SLOT_PREFIX = 'rewind-bowl-save-v1-slot-';
+const ACTIVE_KEY = 'rewind-bowl-active-slot';
+
+/** What the title card needs to draw a slot without hydrating a whole franchise. */
+export interface SaveSummary {
+  slot: number;
+  teamId: string;
+  team: TeamInfo;
+  season: number;
+  week: number;
+  stage: Franchise['seasonStage'];
+  tape: number;
+  record: { wins: number; losses: number; ties: number };
+  titles: number;
+}
+
+function clampSlot(slot: number): number {
+  if (!Number.isFinite(slot)) return 0;
+  return Math.min(SAVE_SLOTS - 1, Math.max(0, Math.trunc(slot)));
+}
+
+function slotKey(slot: number): string {
+  return `${SLOT_PREFIX}${clampSlot(slot)}`;
+}
+
+function storage(): Storage | null {
   try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return null;
+    return typeof localStorage === 'undefined' ? null : localStorage;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * The first build had one key. Move it into slot 1 exactly once, so an existing
+ * career opens on the title card instead of disappearing behind the slot picker.
+ */
+function migrateLegacy(store: Storage) {
+  try {
+    if (store.getItem(slotKey(0)) === null) {
+      const legacy = store.getItem(LEGACY_KEY);
+      if (legacy !== null) store.setItem(slotKey(0), legacy);
+    }
+    if (store.getItem(slotKey(0)) !== null) store.removeItem(LEGACY_KEY);
+  } catch {
+    // A blocked or full store leaves the legacy key for the next launch.
+  }
+}
+
+function readRaw(slot: number): string | null {
+  const store = storage();
+  if (!store) return null;
+  migrateLegacy(store);
+  try {
+    return store.getItem(slotKey(slot));
+  } catch {
+    return null;
+  }
+}
+
+export function activeSlot(): number {
+  const store = storage();
+  if (!store) return 0;
+  try {
+    const saved = Number.parseInt(store.getItem(ACTIVE_KEY) ?? '0', 10);
+    return Number.isFinite(saved) ? clampSlot(saved) : 0;
+  } catch {
+    return 0;
+  }
+}
+
+export function setActiveSlot(slot: number) {
+  const store = storage();
+  if (!store) return;
+  try {
+    store.setItem(ACTIVE_KEY, String(clampSlot(slot)));
+  } catch {
+    // The choice still lives in memory for this session.
+  }
+}
+
+export function loadFranchise(slot = activeSlot()): Franchise | null {
+  const raw = readRaw(slot);
+  if (!raw) return null;
+  try {
     const parsed = JSON.parse(raw) as Partial<Franchise>;
     if (!parsed || parsed.version !== 1 || !parsed.roster || !parsed.schedule) return null;
     const f = parsed as Franchise;
@@ -75,18 +158,72 @@ export function loadFranchise(): Franchise | null {
   }
 }
 
-export function saveFranchise(f: Franchise) {
+export function saveFranchise(f: Franchise, slot = activeSlot()) {
+  const store = storage();
+  if (!store) return;
   try {
-    localStorage.setItem(KEY, JSON.stringify(f));
+    migrateLegacy(store);
+    store.setItem(slotKey(slot), JSON.stringify(f));
   } catch {
     // Storage can be full or blocked; the game keeps running in memory.
   }
 }
 
-export function clearSave() {
+export function clearSave(slot = activeSlot()) {
+  const store = storage();
+  if (!store) return;
   try {
-    localStorage.removeItem(KEY);
+    migrateLegacy(store);
+    store.removeItem(slotKey(slot));
   } catch {
     // ignore
+  }
+}
+
+/**
+ * Read all four tapes for the title card. This parses the saved JSON but does not
+ * hydrate it or stock its market, so looking at a slot cannot change another one.
+ */
+export function listSaveSlots(): Array<SaveSummary | null> {
+  return Array.from({ length: SAVE_SLOTS }, (_, slot) => summarize(slot, readRaw(slot)));
+}
+
+function summarize(slot: number, raw: string | null): SaveSummary | null {
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw) as Partial<Franchise>;
+    if (!parsed || parsed.version !== 1 || !parsed.roster || !parsed.schedule) return null;
+    const f = parsed as Franchise;
+    let wins = 0;
+    let losses = 0;
+    let ties = 0;
+    for (const week of f.schedule) {
+      if (!week.result) continue;
+      if (week.stage && week.stage !== 'regular') continue;
+      if (week.result.tie) ties++;
+      else if (week.result.win) wins++;
+      else losses++;
+    }
+    const team =
+      f.teams?.find((t) => t.id === f.teamId) ??
+      TEAMS.find((t) => t.id === f.teamId) ??
+      TEAMS[0];
+    if (!team) return null;
+    return {
+      slot: clampSlot(slot),
+      teamId: f.teamId,
+      team,
+      season: Number.isFinite(f.season) ? f.season : 1,
+      week: Math.min(
+        Math.max(1, Number.isFinite(f.week) ? f.week : 1),
+        Math.max(1, f.schedule.length),
+      ),
+      stage: f.seasonStage ?? 'regular',
+      tape: Number.isFinite(f.tape) ? f.tape : 0,
+      record: { wins, losses, ties },
+      titles: (f.history ?? []).filter((h) => h.wonBowl).length,
+    };
+  } catch {
+    return null;
   }
 }

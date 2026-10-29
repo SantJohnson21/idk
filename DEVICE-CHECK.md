@@ -212,6 +212,7 @@ it apart from a hype burst.
 | D3 | Install a new debug build over the old one, launch | Save survives an upgrade. |
 | D4 | Reinstall (uninstall first) | Save is gone — expected: localStorage dies with the app. Confirm the title offers `START FRANCHISE`. |
 | D5 | Compare `APP VERSION` with the build you installed | Matches `versionName`/`versionCode` (Android) or `CFBundleShortVersionString`/`CFBundleVersion` (iOS). |
+| D6 | Start four franchises in the four slots, then switch between them from `SAVE SLOTS` | Every slot keeps its own club, season, week and tape; `CONTINUE FRANCHISE` opens the active one after a cold launch. Erasing one slot leaves the other three intact, and erasing the active one returns to the title without touching them. |
 
 Saves are keyed by WebView origin. Changing `server.androidScheme` (currently
 `https`) in `capacitor.config.ts` moves the origin and silently orphans every

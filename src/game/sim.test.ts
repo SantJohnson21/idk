@@ -51,7 +51,15 @@ import {
 import { FILM_HZ, MOMENT_FLOOR, applyFilm, filmWindow, momentScore } from './film';
 import { TAP_RADIUS_PX, cameraScale, tapRadiusForScale } from './render';
 import type { Franchise, PlayOutcome, Player, Ratings } from './types';
-import { loadFranchise, saveFranchise } from './save';
+import {
+  SAVE_SLOTS,
+  activeSlot,
+  clearSave,
+  listSaveSlots,
+  loadFranchise,
+  saveFranchise,
+  setActiveSlot,
+} from './save';
 
 /** A uniform line of ratings, for building a signing better or worse than the roster. */
 const flatRatings = (v: number): Ratings => ({
@@ -1976,11 +1984,11 @@ console.log('--- Settings hydration ---');
   assert.equal(loaded.settings.slowmo, 'full', 'an old save plays the dips as it always has');
   assert.equal(loaded.settings.sound, false, 'existing choices survive hydration');
   assert.equal(loaded.settings.crt, false, 'existing choices survive hydration');
-  store.set(
-    'rewind-bowl-save-v1',
-    JSON.stringify({ ...legacy, version: 1, settings: { ...legacy.settings, slowmo: 'off' } }),
+  saveFranchise(
+    { ...legacy, version: 1, settings: { ...legacy.settings, slowmo: 'off' } },
+    0,
   );
-  assert.equal(loadFranchise()?.settings.slowmo, 'off', 'a saved setting survives a relaunch');
+  assert.equal(loadFranchise(0)?.settings.slowmo, 'off', 'a saved setting survives a relaunch');
   (globalThis as { localStorage?: unknown }).localStorage = undefined;
   console.log('  legacy save → full · saved setting → off · other switches intact');
 }
@@ -3189,6 +3197,59 @@ console.log('--- Hot routes at the line ---');
 
   console.log(
     `  prodigy: ${(rate * 100).toFixed(1)}% of ${sample.length} generated players · ×${PRODIGY_GROWTH} camp growth, ×${PRODIGY_DECLINE} decline · 19yo ${points(kidStar) - START_POINTS} vs ${points(kidPlain) - START_POINTS} pts (${starCamp.delta > 0 ? '+' : ''}${starCamp.delta} vs ${plainCamp.delta > 0 ? '+' : ''}${plainCamp.delta} OVR) · 38yo ${points(vetStar) - START_POINTS} vs ${points(vetPlain) - START_POINTS} pts (${oldStarCamp.delta} vs ${oldPlainCamp.delta} OVR) · training ▤${starCost} vs ▤${normalCost}`,
+  );
+}
+
+console.log('--- Save slots ---');
+{
+  const store = new Map<string, string>();
+  (globalThis as { localStorage?: unknown }).localStorage = {
+    getItem: (k: string) => store.get(k) ?? null,
+    setItem: (k: string, v: string) => {
+      store.set(k, v);
+    },
+    removeItem: (k: string) => {
+      store.delete(k);
+    },
+  };
+
+  // Four independent tapes, each with its own key, its own club and its own week.
+  const east = createFranchise(701, 'nyk');
+  east.tape = 41;
+  east.week = 4;
+  east.season = 2;
+  const west = createFranchise(703, 'dal');
+  west.tape = 77;
+  west.week = 2;
+  saveFranchise(east, 0);
+  saveFranchise(west, 2);
+  setActiveSlot(2);
+  assert.equal(activeSlot(), 2, 'the active tape is remembered');
+  assert.equal(loadFranchise()?.teamId, 'dal', 'CONTINUE resumes the active slot');
+  const rows = listSaveSlots();
+  assert.equal(rows.length, SAVE_SLOTS, 'the title card can show all four slots');
+  assert.equal(rows[0]?.teamId, 'nyk', 'slot one keeps its own club');
+  assert.equal(rows[0]?.tape, 41, 'and its own tape');
+  assert.equal(rows[1], null, 'an unused slot stays empty');
+  assert.equal(rows[2]?.teamId, 'dal', 'slot three keeps the other club');
+  assert.equal(rows[2]?.tape, 77);
+  assert.deepEqual(rows[2]?.record, { wins: 0, losses: 0, ties: 0 });
+
+  // Erasing one tape does not touch the others.
+  clearSave(0);
+  assert.equal(listSaveSlots()[0], null, 'a deleted slot goes empty');
+  assert.equal(listSaveSlots()[2]?.teamId, 'dal', 'and the other tape is untouched');
+
+  // The single-key build migrates into slot one, once.
+  store.clear();
+  store.set('rewind-bowl-save-v1', JSON.stringify(createFranchise(704, 'sea')));
+  assert.equal(loadFranchise()?.teamId, 'sea', 'an old single save still opens');
+  assert.equal(store.has('rewind-bowl-save-v1'), false, 'and is moved off the legacy key');
+  assert.equal(listSaveSlots()[0]?.teamId, 'sea', 'into the first slot');
+
+  (globalThis as { localStorage?: unknown }).localStorage = undefined;
+  console.log(
+    '  four tapes: slot 1 nyk at 41 tape · slot 3 dal at 77 tape · active slot 3 resumes dal · deleting slot 1 leaves dal · legacy single save migrates into slot 1',
   );
 }
 

@@ -82,7 +82,7 @@ and somebody on your roster has to go. Then training camp, tape upgrades, and a 
 - **The club editor** (hub → `✎ EDIT CLUB`) rewrites your city, nickname, abbreviation and the five
   colours the broadcast paints you in, with an end-zone preview as you go. The roster, the tape and
   the rest of the league are untouched — the tape decides your men.
-- **Progression is permanent** across seasons: ratings, quirks, history, titles, and your best finish.
+- **Four tapes, four careers.** Four save slots keep separate clubs, seasons and tape. Switch or erase a tape from `SAVE SLOTS` on the title card without touching the others; the single save from the first builds moves into slot 1.
 
 ## Controls
 
@@ -118,7 +118,7 @@ src/
     render.ts    canvas renderer: field, players, ball, HUD, VHS presentation
     audio.ts     synthesized SFX, crowd and music (no audio files)
     data.ts      teams, quirks, weather, names
-    save.ts      localStorage franchise persistence with defensive hydration
+    save.ts      four localStorage save slots, active-tape selection and defensive hydration
   ui/            React screens: title (club picker), hub (market, club editor), game, offseason
   native.ts      Capacitor bridge: splash, status bar, haptics, back button
   styles.css     the whole broadcast aesthetic

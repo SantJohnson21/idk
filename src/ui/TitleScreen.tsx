@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { Franchise } from '../game/types';
 import { playerTeam, seasonTotals } from '../game/season';
 import { REGULAR_WEEKS, TEAMS } from '../game/data';
+import { SAVE_SLOTS, listSaveSlots, type SaveSummary } from '../game/save';
 import { audio } from '../game/audio';
 import { haptic } from '../native';
 import { APP_VERSION } from '../version';
@@ -9,17 +10,27 @@ import { fmtRecord, Modal, PixelButton, TeamBadge } from './components';
 
 export function TitleScreen({
   franchise,
+  activeSlot,
   onContinue,
   onNew,
+  onLoadSlot,
+  onDeleteSlot,
 }: {
   franchise: Franchise | null;
+  activeSlot: number;
   onContinue: () => void;
-  onNew: (teamId?: string) => void;
+  onNew: (teamId: string | undefined, slot: number) => void;
+  onLoadSlot: (slot: number) => void;
+  onDeleteSlot: (slot: number) => void;
 }) {
-  const [confirmNew, setConfirmNew] = useState(false);
   const [help, setHelp] = useState(false);
   const [pick, setPick] = useState(false);
   const [pickId, setPickId] = useState(TEAMS[0].id);
+  const [slotsOpen, setSlotsOpen] = useState(false);
+  const [slotMode, setSlotMode] = useState<'load' | 'new'>('load');
+  const [newSlot, setNewSlot] = useState(0);
+  const [replaceSlot, setReplaceSlot] = useState<number | null>(null);
+  const [deleteSlot, setDeleteSlot] = useState<number | null>(null);
 
   // Holding the build stamp opens DEVICE CHECK — the hardware checklist panel.
   const holdTimer = useRef<number | null>(null);
@@ -41,9 +52,49 @@ export function TitleScreen({
   const team = franchise ? playerTeam(franchise) : null;
   const totals = franchise ? seasonTotals(franchise) : null;
 
+  // The active slot is drawn from memory so the card never lags a just-finished
+  // snap waiting for the save effect; the other three come from their own keys.
+  const rows: Array<SaveSummary | null> = listSaveSlots().map((stored, i) => {
+    if (i !== activeSlot || !franchise || !team || !totals) return stored;
+    return {
+      slot: i,
+      teamId: franchise.teamId,
+      team,
+      season: franchise.season,
+      week: Math.min(franchise.week, franchise.schedule.length),
+      stage: franchise.seasonStage,
+      tape: franchise.tape,
+      record: { wins: totals.wins, losses: totals.losses, ties: totals.ties },
+      titles: franchise.history.filter((h) => h.wonBowl).length,
+    };
+  });
+  const savedCount = rows.filter(Boolean).length;
+  const replaceTarget = replaceSlot !== null ? (rows[replaceSlot] ?? null) : null;
+  const deleteTarget = deleteSlot !== null ? (rows[deleteSlot] ?? null) : null;
+
+  const openPicker = (slot: number) => {
+    setNewSlot(slot);
+    setSlotsOpen(false);
+    setPick(true);
+  };
+
   const start = () => {
-    if (franchise) setConfirmNew(true);
-    else setPick(true);
+    if (!franchise && savedCount === 0) {
+      setNewSlot(0);
+      setPick(true);
+      return;
+    }
+    setSlotMode('new');
+    setSlotsOpen(true);
+  };
+
+  const chooseNewSlot = (slot: number) => {
+    if (rows[slot]) {
+      setReplaceSlot(slot);
+      setSlotsOpen(false);
+      return;
+    }
+    openPicker(slot);
   };
 
   return (
@@ -97,9 +148,20 @@ export function TitleScreen({
           >
             {franchise ? 'NEW FRANCHISE' : 'START FRANCHISE ▶'}
           </PixelButton>
-          <PixelButton variant="quiet" onClick={() => setHelp(true)}>
-            HOW TO PLAY
-          </PixelButton>
+          <div className="title-cta-quiet">
+            <PixelButton
+              variant="quiet"
+              onClick={() => {
+                setSlotMode('load');
+                setSlotsOpen(true);
+              }}
+            >
+              SAVE SLOTS · {savedCount}/{SAVE_SLOTS}
+            </PixelButton>
+            <PixelButton variant="quiet" onClick={() => setHelp(true)}>
+              HOW TO PLAY
+            </PixelButton>
+          </div>
         </div>
 
         {franchise && team && totals && (
@@ -127,27 +189,133 @@ export function TitleScreen({
         </span>
       </div>
 
-      {confirmNew && franchise && (
+      {slotsOpen && (
         <Modal
-          title="REPLACE THE TAPE?"
-          eyebrow="WARNING"
-          onClose={() => setConfirmNew(false)}
+          title={slotMode === 'new' ? 'CHOOSE A TAPE' : 'SAVE SLOTS'}
+          eyebrow={
+            slotMode === 'new' ? 'NEW FRANCHISE' : `${savedCount} OF ${SAVE_SLOTS} TAPES`
+          }
+          onClose={() => setSlotsOpen(false)}
+          wide
         >
           <p className="modal-copy">
-            Starting a new franchise erases your current save: Season {franchise.season},
-            week {Math.min(franchise.week, franchise.schedule.length)}, {franchise.tape} tape,{' '}
-            {franchise.history.filter((h) => h.wonBowl).length} championship
-            {franchise.history.filter((h) => h.wonBowl).length === 1 ? '' : 's'}.
+            Four tapes, four careers. Every slot keeps its own club, season, roster and
+            history.{' '}
+            {slotMode === 'new'
+              ? ' Pick where this one is recorded.'
+              : ' Load a tape to take over that franchise.'}
+          </p>
+          <div className="save-slots">
+            {rows.map((row, i) => {
+              const active = i === activeSlot && Boolean(franchise);
+              return (
+                <div
+                  className={`save-slot ${active ? 'active' : ''} ${row ? '' : 'empty'}`}
+                  key={i}
+                >
+                  <div className="save-slot-id">SLOT {i + 1}</div>
+                  {row ? (
+                    <>
+                      <TeamBadge team={row.team} size="sm" />
+                      <div className="save-slot-body">
+                        <b>
+                          {row.team.city} {row.team.nickname}
+                        </b>
+                        <small>
+                          SEASON {row.season} ·{' '}
+                          {row.stage === 'offseason' ? 'OFFSEASON' : `WEEK ${row.week}`} ·{' '}
+                          {fmtRecord(row.record.wins, row.record.losses, row.record.ties)} ·{' '}
+                          {row.tape} TAPE
+                        </small>
+                      </div>
+                      <div className="save-slot-actions">
+                        {slotMode === 'load' ? (
+                          active ? (
+                            <span className="save-slot-live">ACTIVE</span>
+                          ) : (
+                            <PixelButton
+                              variant="ghost"
+                              className="btn-compact"
+                              onClick={() => {
+                                onLoadSlot(i);
+                                setSlotsOpen(false);
+                              }}
+                            >
+                              LOAD
+                            </PixelButton>
+                          )
+                        ) : (
+                          <PixelButton
+                            variant={active ? 'danger' : 'gold'}
+                            className="btn-compact"
+                            onClick={() => chooseNewSlot(i)}
+                          >
+                            {active ? 'REPLACE' : 'USE SLOT'}
+                          </PixelButton>
+                        )}
+                        {slotMode === 'load' && (
+                          <button
+                            className="save-slot-trash"
+                            aria-label={`Erase slot ${i + 1}`}
+                            title={`Erase slot ${i + 1}`}
+                            onClick={() => setDeleteSlot(i)}
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="save-slot-body empty">
+                        <b>EMPTY TAPE</b>
+                        <small>NO FRANCHISE ON THIS SLOT</small>
+                      </div>
+                      <div className="save-slot-actions">
+                        <PixelButton
+                          variant="ghost"
+                          className="btn-compact"
+                          onClick={() => openPicker(i)}
+                        >
+                          START HERE
+                        </PixelButton>
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          <div className="modal-actions">
+            <PixelButton variant="ghost" onClick={() => setSlotsOpen(false)}>
+              BACK
+            </PixelButton>
+          </div>
+        </Modal>
+      )}
+
+      {replaceSlot !== null && replaceTarget && (
+        <Modal
+          title={`REPLACE SLOT ${replaceSlot + 1}?`}
+          eyebrow="WARNING"
+          onClose={() => setReplaceSlot(null)}
+        >
+          <p className="modal-copy">
+            Slot {replaceSlot + 1} holds {replaceTarget.team.city}{' '}
+            {replaceTarget.team.nickname}: season {replaceTarget.season}, week{' '}
+            {replaceTarget.week}, {replaceTarget.tape} tape.{' '}
+            Starting a new franchise here erases that tape. The other three are untouched.
           </p>
           <div className="modal-actions">
-            <PixelButton variant="ghost" onClick={() => setConfirmNew(false)}>
-              KEEP PLAYING
+            <PixelButton variant="ghost" onClick={() => setReplaceSlot(null)}>
+              KEEP THE TAPE
             </PixelButton>
             <PixelButton
               variant="danger"
               onClick={() => {
-                setConfirmNew(false);
-                setPick(true);
+                const target = replaceSlot;
+                setReplaceSlot(null);
+                if (target !== null) openPicker(target);
               }}
             >
               ERASE &amp; PICK A CLUB
@@ -156,8 +324,44 @@ export function TitleScreen({
         </Modal>
       )}
 
+      {deleteSlot !== null && deleteTarget && (
+        <Modal
+          title={`ERASE SLOT ${deleteSlot + 1}?`}
+          eyebrow="THIS CANNOT BE UNDONE"
+          onClose={() => setDeleteSlot(null)}
+        >
+          <p className="modal-copy">
+            This erases {deleteTarget.team.city} {deleteTarget.team.nickname} — season{' '}
+            {deleteTarget.season}, week {deleteTarget.week}, {deleteTarget.tape} tape.{' '}
+            The other tapes are untouched.
+          </p>
+          <div className="modal-actions">
+            <PixelButton variant="ghost" onClick={() => setDeleteSlot(null)}>
+              KEEP THE TAPE
+            </PixelButton>
+            <PixelButton
+              variant="danger"
+              onClick={() => {
+                const target = deleteSlot;
+                if (target === null) return;
+                onDeleteSlot(target);
+                setDeleteSlot(null);
+                setSlotsOpen(true);
+              }}
+            >
+              ERASE SLOT {deleteSlot + 1}
+            </PixelButton>
+          </div>
+        </Modal>
+      )}
+
       {pick && (
-        <Modal title="CHOOSE YOUR CLUB" eyebrow="NEW FRANCHISE" onClose={() => setPick(false)} wide>
+        <Modal
+          title="CHOOSE YOUR CLUB"
+          eyebrow={`NEW FRANCHISE · SLOT ${newSlot + 1}`}
+          onClose={() => setPick(false)}
+          wide
+        >
           <p className="modal-copy">
             Sixteen clubs, one tape. Whoever you pick is the team you coach — its colours fill the
             end zone, its nickname goes on the box score — and you can repaint the whole thing in
@@ -205,7 +409,7 @@ export function TitleScreen({
                 const chosen = TEAMS.find((t) => t.id === pickId) ?? TEAMS[0];
                 audio.init();
                 setPick(false);
-                onNew(chosen.id);
+                onNew(chosen.id, newSlot);
               }}
             >
               COACH THE {TEAMS.find((t) => t.id === pickId)?.nickname ?? 'CLUB'} ▶
