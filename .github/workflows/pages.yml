@@ -28,6 +28,10 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v4
 
+      # `enablement: true` can create the Pages site only when the token holds
+      # repository admin. GITHUB_TOKEN does not, so until a repository admin turns
+      # Pages on (Settings -> Pages -> Source: GitHub Actions) this step fails with
+      # `Resource not accessible by integration` and nothing is published.
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
         with:
