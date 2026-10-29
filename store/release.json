@@ -1,0 +1,18 @@
+{
+  "app": "Rewind Bowl '87",
+  "package": "com.rewindbowl.game",
+  "versionName": "1.0.0",
+  "versionCode": 1,
+  "minSdk": 22,
+  "targetSdk": 36,
+  "compileSdk": 36,
+  "builtAt": "2026-10-29T03:45:00Z",
+  "artifact": "rewind-bowl-1.0.0-v1.aab",
+  "bytes": 3430033,
+  "sha256": "41a73d0ec07c44e79a715174c8cae141a08fc47593503528c054cb6935cba48e",
+  "signed": true,
+  "signatureCheck": "jarsigner -verify: exit 0, jar verified.",
+  "bundleCheck": "bundletool validate + build-apks --mode=universal: exit 0; targetSdkVersion 36; versionCode 1; versionName 1.0.0",
+  "uploadKey": "android/rewind-bowl-upload.jks",
+  "uploadKeyConfig": "android/keystore.properties"
+}

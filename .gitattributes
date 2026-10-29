@@ -1,0 +1,12 @@
+# Keep the repository text normalised to LF, with the one file that a Windows
+# shell insists on: the Gradle wrapper. Without this, every line of
+# android/gradlew.bat reads as trailing whitespace in `git diff --check`.
+* text=auto eol=lf
+*.bat text eol=crlf
+
+# Binary assets: icons, splash art, store graphics, the Gradle wrapper jar.
+*.png binary
+*.jpg binary
+*.webp binary
+*.woff2 binary
+*.jar binary

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Rewind Bowl \'87</string>
+    <string name="title_activity_main">Rewind Bowl \'87</string>
+    <string name="package_name">com.rewindbowl.game</string>
+    <string name="custom_url_scheme">com.rewindbowl.game</string>
+</resources>

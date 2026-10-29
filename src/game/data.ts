@@ -1,0 +1,255 @@
+import type { QuirkDef, QuirkId, TeamInfo, Weather, WeatherInfo } from './types';
+
+export const WEATHER: Record<Weather, WeatherInfo> = {
+  CLEAR: {
+    id: 'CLEAR',
+    name: 'CLEAR',
+    desc: 'Perfect football weather. No excuses.',
+    icon: '☀',
+    catchMod: 0,
+    accuracyMod: 0,
+    kickMod: 0,
+    speedMod: 0,
+  },
+  NIGHT: {
+    id: 'NIGHT',
+    name: 'FRIDAY NIGHT',
+    desc: 'Lights on, crowd loud, tape rolling.',
+    icon: '◑',
+    catchMod: 0.01,
+    accuracyMod: 0,
+    kickMod: 0,
+    speedMod: 0,
+  },
+  RAIN: {
+    id: 'RAIN',
+    name: 'RAIN',
+    desc: 'Slick ball, slick turf. Protect it.',
+    icon: '☂',
+    catchMod: -0.1,
+    accuracyMod: 1.5,
+    kickMod: -0.04,
+    speedMod: -0.02,
+  },
+  WIND: {
+    id: 'WIND',
+    name: 'WINDY',
+    desc: 'The deep ball is going to sail.',
+    icon: '≈',
+    catchMod: -0.02,
+    accuracyMod: 1.9,
+    kickMod: -0.11,
+    speedMod: 0,
+  },
+  SNOW: {
+    id: 'SNOW',
+    name: 'SNOW',
+    desc: 'Everything slows down except the hits.',
+    icon: '✻',
+    catchMod: -0.12,
+    accuracyMod: 2.2,
+    kickMod: -0.1,
+    speedMod: -0.06,
+  },
+  FOG: {
+    id: 'FOG',
+    name: 'FOG',
+    desc: 'You can barely see the secondary.',
+    icon: '≡',
+    catchMod: -0.13,
+    accuracyMod: 1.6,
+    kickMod: -0.03,
+    speedMod: -0.02,
+  },
+};
+
+export const QUIRKS: Record<QuirkId, QuirkDef> = {
+  cannon: { id: 'cannon', name: 'CANNON', desc: '+8 ARM. Deep shots come out hot.', icon: '◆' },
+  burner: { id: 'burner', name: 'BURNER', desc: '+6 SPD. Slight edge in the open field.', icon: '»' },
+  sure_hands: { id: 'sure_hands', name: 'SURE HANDS', desc: '+8 HANDS. Rarely drops the easy one.', icon: '✚' },
+  ballhawk: { id: 'ballhawk', name: 'BALLHAWK', desc: '+8 COV. Shuts down his side.', icon: '◉' },
+  bruiser: { id: 'bruiser', name: 'BRUISER', desc: '+8 TKL, +6 POW. Brings the wood.', icon: '▲' },
+  iron_man: { id: 'iron_man', name: 'IRON MAN', desc: 'Stamina drains 35% slower.', icon: '∞' },
+  clutch: { id: 'clutch', name: 'CLUTCH', desc: '+7 to everything in the 4th quarter.', icon: '★' },
+  showtime: { id: 'showtime', name: 'SHOWTIME', desc: '+50% hype from big plays.', icon: '☼' },
+  sniper: { id: 'sniper', name: 'SNIPER', desc: 'True leg. Wide kick meter window.', icon: '⊹' },
+  magnet: { id: 'magnet', name: 'MAGNET', desc: '+6% catch chance on contested balls.', icon: '✹' },
+  field_general: { id: 'field_general', name: 'FIELD GENERAL', desc: '+6 ARM, cleaner pocket.', icon: '♟' },
+};
+
+export const QUIRK_LIST = Object.values(QUIRKS);
+
+export const TEAMS: TeamInfo[] = [
+  {
+    id: 'mia',
+    city: 'MIAMI',
+    nickname: 'THUNDER',
+    abbr: 'MIA',
+    off: 78,
+    def: 76,
+    kick: 80,
+    colors: {
+      primary: '#1fe3cf',
+      secondary: '#ff2e88',
+      accent: '#ffe66d',
+      dark: '#06222a',
+      jersey: '#1fe3cf',
+    },
+  },
+  {
+    id: 'dal',
+    city: 'DALLAS',
+    nickname: 'DYNAMO',
+    abbr: 'DAL',
+    off: 82,
+    def: 78,
+    kick: 76,
+    colors: {
+      primary: '#4f86ff',
+      secondary: '#dbe6ff',
+      accent: '#ffd166',
+      dark: '#0d1b3d',
+      jersey: '#4f86ff',
+    },
+  },
+  {
+    id: 'chi',
+    city: 'CHICAGO',
+    nickname: 'FORGE',
+    abbr: 'CHI',
+    off: 74,
+    def: 84,
+    kick: 82,
+    colors: {
+      primary: '#ff495c',
+      secondary: '#f3e9d2',
+      accent: '#ffb703',
+      dark: '#2b0a10',
+      jersey: '#ff495c',
+    },
+  },
+  {
+    id: 'sea',
+    city: 'SEATTLE',
+    nickname: 'SQUALL',
+    abbr: 'SEA',
+    off: 76,
+    def: 80,
+    kick: 87,
+    colors: {
+      primary: '#4ade80',
+      secondary: '#0b2b22',
+      accent: '#a7f3d0',
+      dark: '#07211b',
+      jersey: '#4ade80',
+    },
+  },
+  {
+    id: 'den',
+    city: 'DENVER',
+    nickname: 'SUMMIT',
+    abbr: 'DEN',
+    off: 80,
+    def: 72,
+    kick: 74,
+    colors: {
+      primary: '#ffa94d',
+      secondary: '#3b2a1a',
+      accent: '#ffe8cc',
+      dark: '#241407',
+      jersey: '#ffa94d',
+    },
+  },
+  {
+    id: 'tam',
+    city: 'TAMPA',
+    nickname: 'TIDE',
+    abbr: 'TAM',
+    off: 72,
+    def: 74,
+    kick: 78,
+    colors: {
+      primary: '#ff8c42',
+      secondary: '#12405a',
+      accent: '#ffd6a5',
+      dark: '#0a1c26',
+      jersey: '#ff8c42',
+    },
+  },
+  {
+    id: 'phx',
+    city: 'PHOENIX',
+    nickname: 'EMBERS',
+    abbr: 'PHX',
+    off: 84,
+    def: 70,
+    kick: 72,
+    colors: {
+      primary: '#ff5c00',
+      secondary: '#3d0a2e',
+      accent: '#ffd166',
+      dark: '#25061b',
+      jersey: '#ff5c00',
+    },
+  },
+  {
+    id: 'nyk',
+    city: 'NEW YORK',
+    nickname: 'KNIGHTS',
+    abbr: 'NYC',
+    off: 71,
+    def: 86,
+    kick: 80,
+    colors: {
+      primary: '#a78bfa',
+      secondary: '#16102e',
+      accent: '#e9d5ff',
+      dark: '#0d0920',
+      jersey: '#a78bfa',
+    },
+  },
+];
+
+export const PLAYER_TEAM_ID = 'mia';
+
+export const DIFFICULTY_BONUS = {
+  rookie: -7,
+  pro: 0,
+  legend: 7,
+};
+
+export const FIRST_NAMES = [
+  'Bo', 'Dex', 'Rico', 'Ty', 'Marv', 'Cal', 'Junior', 'Deuce', 'Otis', 'Rocco',
+  'Leon', 'Mack', 'Wes', 'Duke', 'Chip', 'Vic', 'Sonny', 'Rashad', 'Brick', 'Ezra',
+  'Kofi', 'Milo', 'Rudy', 'Trey', 'Lonnie', 'Dash', 'Sonny', 'August', 'Beau', 'Cruz',
+  'Hank', 'Ike', 'Jules', 'Kip', 'Lars', 'Nico', 'Ollie', 'Pax', 'Quin', 'Remy',
+  'Sasha', 'Tino', 'Ugo', 'Vito', 'Walt', 'Xander', 'Yuri', 'Zeke', 'Ari', 'Bram',
+];
+
+export const LAST_NAMES = [
+  'Vega', 'Stone', 'McCall', 'Bishop', 'Rowe', 'Castillo', 'Dunn', 'Hale', 'Fontaine', 'Okafor',
+  'Reyes', 'Boone', 'Kowalski', 'Nash', 'Pruitt', 'Sato', 'Vaughn', 'Winters', 'Zeller', 'Amos',
+  'Barlow', 'Cobb', 'Delgado', 'Esposito', 'Freeman', 'Grady', 'Holt', 'Izzo', 'Jarvis', 'Kane',
+  'Lombardi', 'Mercer', 'Novak', 'Ortega', 'Pike', 'Quinn', 'Rourke', 'Salazar', 'Tate', 'Upton',
+  'Vance', 'Whitaker', 'Yates', 'Zamora', 'Ashby', 'Brass', 'Cutter', 'Diamond', 'Everett', 'Flint',
+];
+
+export const CITY_FLAVORS = [
+  'NEON', 'MIDNIGHT', 'GOLDEN', 'IRON', 'TURBO', 'SUNSET', 'THUNDER', 'STATIC',
+  'VINYL', 'CHROME', 'NEON', 'COASTAL', 'MOTOR', 'CASSETTE', 'LASER', 'HIGH VOLTAGE',
+];
+
+export const HIGHLIGHT_PHRASES = [
+  'VHS gold. Somebody frame that.',
+  'The tape does not lie.',
+  'That one is going straight to the highlight reel.',
+  'Rewind that. Nobody will believe you.',
+  'Textbook football, 1987 edition.',
+];
+
+export const RIVALRY_LINES = [
+  'The crowd is already on its feet.',
+  'Win this one and the city throws a parade.',
+  'Two teams, one tape, zero excuses.',
+  'Somebody has to blink first.',
+];

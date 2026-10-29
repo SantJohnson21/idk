@@ -1,0 +1,67 @@
+{
+  "generatedAt": "2026-10-29T03:54:31.572Z",
+  "source": "http://127.0.0.1:4173",
+  "viewport": {
+    "width": 405,
+    "height": 720
+  },
+  "deviceScaleFactor": 2.6666666666666665,
+  "assets": [
+    {
+      "path": "store/icon-512.png",
+      "width": 512,
+      "height": 512,
+      "bytes": 59662,
+      "sha256": "91b26631b9a32f27e16908a0f9d1b30dc782f3295bf5042fdc909837f64e3a1b"
+    },
+    {
+      "path": "store/feature-graphic-1024x500.png",
+      "width": 1024,
+      "height": 500,
+      "bytes": 274162,
+      "sha256": "64d9958f1c9b4ae7f1a50fd95fa0e424f7b58cb78b579c28c0372efd4a2390db"
+    },
+    {
+      "path": "store/screenshots/phone-01-title.png",
+      "width": 1080,
+      "height": 1920,
+      "bytes": 839417,
+      "sha256": "28a7ea47c7b2c6281d08dc69e58ee7a17c99460286d653f941c754aa0b6ee4af"
+    },
+    {
+      "path": "store/screenshots/phone-02-clubs.png",
+      "width": 1080,
+      "height": 1920,
+      "bytes": 214824,
+      "sha256": "fb1bea6c31571f60866a590e692695a72d0a108df9b441dc9194797c5181abab"
+    },
+    {
+      "path": "store/screenshots/phone-03-hub.png",
+      "width": 1080,
+      "height": 1920,
+      "bytes": 293914,
+      "sha256": "a117ea46becde1c809f3d28d73a53d4db49ae6312b3c9317b7d990b6905b1a2a"
+    },
+    {
+      "path": "store/screenshots/phone-04-market.png",
+      "width": 1080,
+      "height": 1920,
+      "bytes": 151171,
+      "sha256": "1b325b5c38f5ed0d2ceac44471ccce180a97646441236a339c787ac648577c2a"
+    },
+    {
+      "path": "store/screenshots/phone-05-ready.png",
+      "width": 1080,
+      "height": 1920,
+      "bytes": 490081,
+      "sha256": "d3d9aa428f17ffef8ed73f3481e45e067d0ca4a23c87ef18a1ccad02e7501d76"
+    },
+    {
+      "path": "store/screenshots/phone-06-live.png",
+      "width": 1080,
+      "height": 1920,
+      "bytes": 477216,
+      "sha256": "ffe521ea79b70426768b7cb3b19d780014f81b1cfda7a5fa5ebfa43523e51108"
+    }
+  ]
+}

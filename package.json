@@ -1,0 +1,53 @@
+{
+  "name": "rewind-bowl",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Rewind Bowl — a retro VHS football game for mobile",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "tsx src/game/sim.test.ts",
+    "release:record": "node scripts/release-record.mjs",
+    "release:record:check": "node scripts/release-record.mjs --check",
+    "play:assets": "node scripts/make-store-assets.mjs",
+    "mobile:assets": "node scripts/make-assets.mjs && capacitor-assets generate --android --ios --iconBackgroundColor '#080b12' --splashBackgroundColor '#080b12' --splashBackgroundColorDark '#04070b'",
+    "mobile:sync": "npm run build && cap sync && npm run release:record",
+    "mobile:android": "npm run mobile:sync && cap open android",
+    "mobile:ios": "npm run mobile:sync && cap open ios",
+    "mobile:devices": "node scripts/devices.mjs",
+    "mobile:preflight": "node scripts/adb-preflight.mjs",
+    "mobile:run:android": "npm run mobile:sync && cap run android",
+    "mobile:run:ios": "npm run mobile:sync && cap run ios",
+    "mobile:live:android": "cap run android --live-reload --host localhost --port 3000 --forwardPorts 3000:3000",
+    "mobile:live:ios": "cap run ios --live-reload --host localhost --port 3000",
+    "mobile:logs": "adb logcat -v time chromium:V Capacitor/Console:V Capacitor:V '*:S'",
+    "mobile:apk": "npm run mobile:sync && cd android && ./gradlew assembleDebug && cd .. && node scripts/release-record.mjs --artifact android/app/build/outputs/apk/debug/app-debug.apk --label 'Android debug APK'",
+    "mobile:aab": "npm run mobile:sync && cd android && ./gradlew bundleRelease && cd .. && node scripts/release-record.mjs --artifact android/app/build/outputs/bundle/release/app-release.aab --label 'Android release bundle'",
+    "mobile:ipa": "npm run mobile:sync && cd ios/App && xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -archivePath build/App.xcarchive archive && xcodebuild -exportArchive -archivePath build/App.xcarchive -exportPath build/export -exportOptionsPlist ../ExportOptions.plist && cd ../.. && node scripts/release-record.mjs --artifact 'ios/App/build/export/*.ipa' --label 'iOS archive'"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.2",
+    "@capacitor/app": "^6.0.3",
+    "@capacitor/core": "^6.2.2",
+    "@capacitor/haptics": "^6.0.3",
+    "@capacitor/ios": "^6.2.2",
+    "@capacitor/splash-screen": "^6.0.4",
+    "@capacitor/status-bar": "^6.0.3",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^6.2.2",
+    "@types/node": "^22.20.5",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "@vitejs/plugin-react": "4.3.4",
+    "playwright": "^1.48.2",
+    "tsx": "4.19.2",
+    "typescript": "5.6.3",
+    "vite": "5.4.11"
+  }
+}

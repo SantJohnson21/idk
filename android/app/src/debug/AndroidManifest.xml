@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Debug-only manifest overlay.
+
+  `npm run mobile:live:android` serves the game over plain http from the dev
+  machine (adb reverse tcp:3000), and Android blocks cleartext by default. This
+  overlay lifts that for debug builds only; the main manifest keeps
+  android:usesCleartextTraffic="false" for release, so the shipped app still
+  refuses unencrypted traffic.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <application
+        android:usesCleartextTraffic="true"
+        tools:replace="android:usesCleartextTraffic" />
+</manifest>
