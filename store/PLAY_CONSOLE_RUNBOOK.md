@@ -498,6 +498,69 @@ listing copy only needs a change if the release notes change. The AAB is
 gitignored by `store/*.aab`; it will not be in a git push, so upload it from the
 workspace.
 
+## Scripted publishing (optional)
+
+Everything above works by hand. If you would rather not drag the AAB onto the
+upload page for every build, `tools/play-publish.mjs` does the same release
+through the Android Publisher API. It needs no npm packages, no JDK and no
+`gcloud` — just `node:crypto` and `node:zlib`.
+
+### One-time: create the service account
+
+1. Play Console → **Setup → API access**.
+2. Link (or create) a Google Cloud project when prompted.
+3. **Create service account** → follow the Cloud console link → create the
+   account → **Keys → Add key → JSON** → download it.
+4. Back in Play Console → **API access** → grant that account
+   **Release to testing tracks**. Add *Release to production* only when you are
+   actually shipping to production.
+5. Save the JSON as `store/play-service-account.json`, or point
+   `PLAY_SERVICE_ACCOUNT_JSON` at wherever it lives. `store/play-service-account*.json`
+   is gitignored, so the key cannot be committed.
+
+Permissions propagate slowly; calls fail with HTTP 401/403 until they do.
+
+### Dry run — validates everything, sends nothing
+
+```bash
+npm run play:publish -- --dry-run
+```
+
+It parses the key, signs a throwaway RS256 assertion to prove the PEM works,
+opens the AAB, reads `versionCode`/`versionName`/package out of
+`base/manifest/AndroidManifest.xml`, checks the notes against Play's
+500-character limit, and prints the exact request plan. No network call is made.
+
+### Real publish to the internal track
+
+```bash
+npm run play:publish -- --track internal --notes "Closed test 1.0.0 (1)."
+```
+
+Without `--yes` it prints the plan and waits for you to type `publish`. The
+sequence is open edit → upload bundle → set the track release (`completed`) →
+commit. If any step after the edit is opened fails, the edit is deleted, so Play
+is never left holding a half-built release.
+
+| Flag | Default | Meaning |
+| --- | --- | --- |
+| `--bundle` | newest `store/*.aab` | the bundle to upload |
+| `--package` | the bundle's own package | must match `com.rewindbowl.game` |
+| `--track` | `internal` | `internal`, `alpha`, `beta`, `production` |
+| `--notes` / `--notes-file` | none | release notes, `en-US` |
+| `--dry-run` | off | plan only |
+| `--yes` | off | skip the typed confirmation |
+
+Self-test — generated in-memory key, no Google credential, no network:
+
+```bash
+npm run play:publish:test
+```
+
+App creation, the App content declarations, the screenshots, the closed-test
+roster and the production-access application stay manual: the API cannot file a
+data safety form or opt a tester in.
+
 ## Official references
 
 - [Create and set up your app](https://support.google.com/googleplay/android-developer/answer/9859152)

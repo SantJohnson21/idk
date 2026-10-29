@@ -22,6 +22,10 @@ android/keystore.properties
 store/*.aab
 store/source/
 
+# Google Play service-account keys — tools/play-publish.mjs looks for one here.
+# Whatever the name, a key file must never enter history.
+store/play-service-account*.json
+
 # Capacitor copies the web build into both native projects on every sync.
 android/app/src/main/assets/public/
 android/app/src/main/assets/capacitor.config.json

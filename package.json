@@ -12,6 +12,8 @@
     "release:record": "node scripts/release-record.mjs",
     "release:record:check": "node scripts/release-record.mjs --check",
     "play:assets": "node scripts/make-store-assets.mjs",
+    "play:publish": "node tools/play-publish.mjs",
+    "play:publish:test": "node --test tools/play-publish.test.mjs",
     "mobile:assets": "node scripts/make-assets.mjs && capacitor-assets generate --android --ios --iconBackgroundColor '#080b12' --splashBackgroundColor '#080b12' --splashBackgroundColorDark '#04070b'",
     "mobile:sync": "npm run build && cap sync && npm run release:record",
     "mobile:android": "npm run mobile:sync && cap open android",
