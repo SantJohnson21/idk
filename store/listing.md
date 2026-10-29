@@ -54,7 +54,7 @@ The whole game is on the device. Saves are local: uninstalling the app erases th
 - **Tags:** Football, Sports, Retro, Pixel art, Single player, Offline
 - **Contact email:** `tronjohnson57@gmail.com`
 - **Website:** optional
-- **Privacy policy:** `https://santjohnson21.github.io/idk/privacy.html` (publish `docs/` with the Pages workflow before entering this URL — see PLAY.md)
+- **Privacy policy:** `https://santjohnson21.github.io/idk/privacy.html` — canonical Play URL; it must return HTTP 200 before you enter it, and the 2026-10-29 check is still 404 (see the runbook)
 
 ## Graphics map
 
@@ -67,10 +67,8 @@ The whole game is on the device. Saves are local: uninstalling the app erases th
 The screenshots are 1080×1920 (9:16). Upload them in filename order; the first one
 is the one that shows on the listing until a user swipes.
 
-## Release notes — first release
+## Release notes — 1.0.0 (1)
 
 ```text
-First release. Eight clubs, a full eight-week season and playoffs, hot routes at
-the line, quarterback scrambles, tape rewinds, the market, the club editor — and a
-field that turns sideways with the phone.
+First release. Eight clubs, a full eight-week season and playoffs, hot routes at the line, quarterback scrambles, tape rewinds, the market, the club editor, and a field that turns sideways with the phone. Offline: no ads, no purchases, no account.
 ```

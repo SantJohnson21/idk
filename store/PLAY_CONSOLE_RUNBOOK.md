@@ -20,17 +20,17 @@ uploading.
 | App icon | [`store/icon-512.png`](icon-512.png) exists — **512×512**, 59,662 B |
 | Feature graphic | [`store/feature-graphic-1024x500.png`](feature-graphic-1024x500.png) exists — **1024×500**, 274,162 B |
 | Phone screenshots | six files, all **1080×1920**: [`phone-01-title.png`](screenshots/phone-01-title.png), [`phone-02-clubs.png`](screenshots/phone-02-clubs.png), [`phone-03-hub.png`](screenshots/phone-03-hub.png), [`phone-04-market.png`](screenshots/phone-04-market.png), [`phone-05-ready.png`](screenshots/phone-05-ready.png), [`phone-06-live.png`](screenshots/phone-06-live.png) |
-| Listing limits | App name **15/30**, short description **71/80**, full description **2,284/4,000**, release notes **205/500** characters |
+| Listing limits | App name **15/30**, short description **71/80**, full description **2,284/4,000**, release notes **247/500** characters |
 | Privacy page | [`docs/privacy.html`](../docs/privacy.html) exists (3,870 B) with the contact set to `tronjohnson57@gmail.com`; no placeholder remains |
 | Policy text | [`store/privacy-policy.md`](privacy-policy.md) exists with the same contact in both places |
-| Privacy hosting | [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) publishes [`docs/`](../docs/) to GitHub Pages on pushes to `main`; [`docs/.nojekyll`](../docs/.nojekyll) is present. **Not deployed from this workspace.** |
+| Privacy hosting | [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) publishes [`docs/`](../docs/) to GitHub Pages on pushes to `main`; [`docs/.nojekyll`](../docs/.nojekyll) is present. **Live check 2026-10-29: the canonical URL returns 404 (“Site not found”); the workflow’s authenticated `configure-pages` step reports `Get Pages site failed: Not Found` and cannot create the site (`Resource not accessible by integration`). The public Pages API is rate-limited from this sandbox (403). Do not enter the URL in Play yet.** |
 | Declarations file | [`store/data-safety.md`](data-safety.md) exists |
 | Merged permissions | `android.permission.INTERNET`, `android.permission.VIBRATE`, and the app-defined `com.rewindbowl.game.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` — **no `AD_ID`**, no location, camera, microphone, contacts, storage or notification permission |
 | Ads / analytics | No ads or analytics dependencies in [`package.json`](../package.json); `google-services.json` is absent; source search finds no AdMob/AdSense/AppLovin/Unity Ads/IronSource/Firebase/AppsFlyer/Adjust/Sentry/Bugsnag/Segment/Mixpanel/PostHog usage |
 | Network calls | No `fetch`, `XMLHttpRequest`, `WebSocket`, `sendBeacon`, `axios` or `http(s)://` call sites in `../src`, `../index.html` or `../capacitor.config.ts` |
 | Release hardening | AAB application has `allowBackup="false"` and `usesCleartextTraffic="false"` |
 | Upload key | [`android/rewind-bowl-upload.jks`](../android/rewind-bowl-upload.jks) and [`android/keystore.properties`](../android/keystore.properties) exist (gitignored; do not commit or share) |
-| Not verified | No device/emulator install, no testers, no Play upload, no review, no hardware run, no Pages deployment |
+| Not verified | No device/emulator install, no testers, no Play upload, no review, no hardware run, and no Pages deployment — the privacy URL is still 404 |
 
 How those checks were made:
 
@@ -60,6 +60,49 @@ user-data permission.
   internal and not a data permission.
 - The release build disables cleartext traffic and Android backup.
 
+## FALLBACK — if the privacy URL is still 404
+
+**Status checked 2026-10-29.** `https://santjohnson21.github.io/idk/privacy.html`
+returns **404** (“Site not found”). The public Pages API reads are currently
+blocked by this sandbox IP’s unauthenticated rate limit: **403**,
+`API rate limit exceeded` (reset 06:39 UTC). The authenticated workflow output is
+the useful signal: `actions/configure-pages@v5` reports `Get Pages site failed:
+Not Found`, then `Create Pages site failed: Resource not accessible by
+integration`. Both runs (`40817742903`, `40824702390`) fail at that step.
+
+The missing credential is a **repo-admin user token**. This sandbox has none: no
+`GH_TOKEN`/`GITHUB_TOKEN`, `gh auth status` is logged out, no
+`~/.config/gh/hosts.yml`, `~/.netrc` or `~/.git-credentials`, no
+`credential.helper`, and `ssh -T git@github.com` returns `Permission denied
+(publickey)`. The Actions `GITHUB_TOKEN` cannot create a Pages site, even with
+`pages: write`; `enablement: true` cannot change that.
+
+**Smallest one-time fix (browser, no token):**
+1. Open <https://github.com/SantJohnson21/idk/settings/pages>.
+2. Under **Build and deployment → Source**, choose **GitHub Actions**.
+3. Open **Actions → Deploy privacy page → Re-run all jobs**.
+
+**API alternative (repo-admin token):**
+```bash
+curl -sS -X POST \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Accept: application/vnd.github+json" \
+  https://api.github.com/repos/SantJohnson21/idk/pages \
+  -d '{"build_type":"workflow"}'
+```
+Use a classic PAT with `repo`, or a fine-grained token with **Pages: Read and
+write** plus **Administration: Read and write** for this repository. A `201`
+means created; `409` means it already exists. Then re-run the workflow. Do not
+use the Actions `GITHUB_TOKEN`.
+
+**Fallback URL while blocked:**
+<https://raw.githubusercontent.com/SantJohnson21/idk/main/docs/privacy.html>
+returns **200**, `text/plain; charset=utf-8`, 3,870 bytes, and contains the
+contact plus both `mailto:` links. It is not a substitute for the Play-facing
+page: Play expects a browser-readable policy page, and raw text is not the
+canonical `github.io` page. Do not enter the raw URL in Play; keep the canonical
+URL pending until it returns 200.
+
 ## Before screen 1
 
 Have these ready:
@@ -76,16 +119,19 @@ Have these ready:
 | Listing copy | [`store/listing.md`](listing.md) |
 | App content answers | [`store/data-safety.md`](data-safety.md) |
 | Privacy page | [`docs/privacy.html`](../docs/privacy.html) — contact set; publish it with the Pages workflow before entering the URL |
-| Privacy URL | `https://santjohnson21.github.io/idk/privacy.html` (after the Pages deploy) |
+| Privacy URL | `https://santjohnson21.github.io/idk/privacy.html` — canonical Play URL; **currently 404, so do not enter it until it returns 200** |
 | Icon | [`store/icon-512.png`](icon-512.png) |
 | Feature graphic | [`store/feature-graphic-1024x500.png`](feature-graphic-1024x500.png) |
 | Screenshots | the six files under [`store/screenshots/`](screenshots/) |
 
 **Privacy hosting:** the contact placeholder is gone; both the page and
-`store/privacy-policy.md` use `tronjohnson57@gmail.com`. The Pages workflow has
-not run from this workspace, so confirm
-`https://santjohnson21.github.io/idk/privacy.html` returns 200 before submitting
-App content. Do not enter a URL that is not publicly reachable.
+`store/privacy-policy.md` use `tronjohnson57@gmail.com`. The Pages workflow is
+committed, but the site is not enabled: on 2026-10-29 the canonical URL returned
+**404**. The public Pages API is rate-limited from this sandbox (**403**, reset
+06:39 UTC); the workflow’s authenticated `configure-pages` step reports
+`Get Pages site failed: Not Found` and `Create Pages site failed: Resource not
+accessible by integration`. Do not submit App content with this URL until it
+returns 200. See **FALLBACK** below for the one-time fix.
 
 **Signing:** the AAB is signed with the upload key in
 `android/rewind-bowl-upload.jks`. Keep that file and `android/keystore.properties`
@@ -135,8 +181,9 @@ Play Console → **Policy and programs → App content** (some accounts label it
 
 ### Privacy policy
 
-Paste `https://santjohnson21.github.io/idk/privacy.html` once the Pages workflow
-has published `docs/`. The page must return 200 before you submit.
+Paste `https://santjohnson21.github.io/idk/privacy.html` only after it returns
+200. The Pages workflow is committed, but the 2026-10-29 live check is still
+**404**; enable Pages first (see “Privacy hosting” above).
 
 ### App access
 
@@ -202,7 +249,7 @@ are:
 - App name: **15 characters** (limit 30)
 - Short description: **71 characters** (limit 80)
 - Full description: **2,284 characters** (limit 4,000)
-- Release notes: **205 characters** (limit 500)
+- Release notes: **247 characters** (limit 500)
 
 ### Graphics
 
@@ -250,8 +297,9 @@ On the Closed testing page, click **Create new release**.
 2. Upload [`store/rewind-bowl-1.0.0-v1.aab`](rewind-bowl-1.0.0-v1.aab).
 3. Confirm Play reads versionName `1.0.0`, versionCode `1`, target SDK `36`.
 4. Release name: keep `1.0.0 (1)` or use `1.0.0 — first closed test`.
-5. Release notes: paste the 205-character block from
-   [`store/listing.md`](listing.md).
+5. Release notes: paste the 247-character block from
+   [`store/closed-test-invite.md`](closed-test-invite.md) (also in
+   [`store/listing.md`](listing.md)).
 6. **Save → Review release → Start rollout to Closed testing**.
 
 The first closed release may wait in Google review for hours to a few days.
@@ -278,14 +326,10 @@ tester opts out, that tester’s 14 days restart when they opt back in. Keep 12+
 opted in the whole time. Internal testing is optional and does not count toward
 this requirement. Open testing is available only after production access.
 
-A tester message you can adapt:
-
-> You’re invited to test Rewind Bowl '87, a retro football game for Android. Open
-> this opt-in link on your Android phone, accept the invite, and install it.
-> Please play a few drives or a full game, try rotating the phone sideways, and
-> send me one thing that felt good and one thing that felt wrong. Keep the app
-> installed and stay opted in until [date] — Google requires 12 testers for 14
-> continuous days.
+The ready-to-send invitation, opt-in checklist, short message and the exact
+first-build release notes are in
+[`closed-test-invite.md`](closed-test-invite.md). Send it only after the closed
+release is live, the opt-in URL is pasted, and the privacy URL returns 200.
 
 No testers have been recruited or run from this workspace. This section is setup
 guidance, not a claim that testing happened.
@@ -378,7 +422,7 @@ code `1`.
 | Closed testing page is locked | Finish the Dashboard/App content setup first. |
 | “Apply for production” is greyed out | Fewer than 12 testers opted in, fewer than 14 continuous days, or app setup is incomplete. |
 | Testers see “Item not found” | Wrong Google account, not on the email list, wrong country, or the release is not rolled out. |
-| Privacy policy URL invalid | `docs/privacy.html` is not published yet, or Pages is not enabled. Run the Pages workflow and confirm the URL returns 200. |
+| Privacy policy URL invalid | The 2026-10-29 live check is still 404, so Pages is not enabled. Set **Settings → Pages → Source: GitHub Actions**, re-run the workflow, and confirm the URL returns 200. |
 | Store listing asks for a contact email | Enter `tronjohnson57@gmail.com` in Store settings. |
 | Upload rejects the AAB as “not compatible” | Confirm the package is `com.rewindbowl.game` and the file is the AAB, not the debug APK. |
 
