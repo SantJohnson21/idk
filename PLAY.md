@@ -1,8 +1,10 @@
 # Publishing REWIND BOWL '87 on Google Play
 
-**Status:** the signed Play bundle is built and validated. The remaining steps are
-in the Play Console under your Google account — this workspace cannot sign in,
-accept the Developer Distribution Agreement, or upload on your behalf.
+**Status:** the current signed Play bundle is built and validated against the
+current `dist/`. The remaining steps are in the Play Console under your Google
+account — this workspace cannot sign in, accept the Developer Distribution
+Agreement, or upload on your behalf. The checked, screen-by-screen version is
+[`store/PLAY_CONSOLE_RUNBOOK.md`](store/PLAY_CONSOLE_RUNBOOK.md).
 
 ## The upload package
 
@@ -12,9 +14,9 @@ accept the Developer Distribution Agreement, or upload on your behalf.
 | Version | `1.0.0` (versionCode `1`) |
 | Target / compile SDK | **36** (Android 16) |
 | Minimum SDK | 22 |
-| AAB | [`store/rewind-bowl-1.0.0-v1.aab`](store/rewind-bowl-1.0.0-v1.aab) |
-| Size | 3,430,033 bytes (3.43 MB) |
-| SHA-256 | `41a73d0ec07c44e79a715174c8cae141a08fc47593503528c054cb6935cba48e` |
+| AAB | [`store/rewind-bowl-1.0.0-v1.aab`](store/rewind-bowl-1.0.0-v1.aab) — current |
+| Size | 3,434,252 bytes (3.43 MB) |
+| SHA-256 | `3747fa0d9f858ffdfbd9f8ba5286dc23932434ed7b4fcea74a0626303dccc51a` |
 | Upload key | `android/rewind-bowl-upload.jks` (gitignored) |
 | Key config | `android/keystore.properties` (gitignored) |
 | Listing copy | [`store/listing.md`](store/listing.md) |
@@ -179,13 +181,14 @@ jarsigner -verify store/rewind-bowl-1.0.0-v1.aab
 ## What was verified in this workspace
 
 - `npm run mobile:sync` — web bundle built, copied into both shells, build record
-  stamped (`399,373 B → 125,179 B` gzip).
-- `./gradlew bundleRelease` — **BUILD SUCCESSFUL**, 239 tasks, 1m 35s.
+  stamped (`413,490 B → 129,375 B` gzip).
+- `./gradlew bundleRelease` — **BUILD SUCCESSFUL**, 239 tasks, 46s.
 - `jarsigner -verify` — exit 0, `jar verified.`
+- `unzip -t` — exit 0, `No errors detected`.
 - `bundletool validate` — exit 0.
-- `bundletool build-apks --mode=universal` — exit 0; the generated APK reports
+- `bundletool build-apks --mode=universal` — exit 0; the bundle manifest reports
   `versionCode='1'`, `versionName='1.0.0'`, `targetSdkVersion:'36'`,
-  `minSdkVersion:'22'`, label `Rewind Bowl '87`.
+  `minSdkVersion:'22'`, package `com.rewindbowl.game`.
 - `npm run play:assets` — six 1080×1920 phone screenshots, 1024×500 feature
   graphic and 512×512 icon generated from the production UI; every file's
   dimensions and SHA-256 are in `store/assets.json`.

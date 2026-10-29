@@ -44,14 +44,18 @@ npm run play:assets      # 1080×1920 screenshots, feature graphic and icon
 ```
 
 Signing keys, version numbers, the App Store privacy manifest and the store
-checklists are documented in [MOBILE.md](MOBILE.md). The Play Console sequence,
-listing copy, declaration answers and signed bundle are in [PLAY.md](PLAY.md) and
-[`store/`](store/README.md). The hardware pass — splash,
+checklists are documented in [MOBILE.md](MOBILE.md). The checked Play Console
+path, listing copy, declaration answers and upload package are in
+[`store/PLAY_CONSOLE_RUNBOOK.md`](store/PLAY_CONSOLE_RUNBOOK.md) and
+[`store/`](store/README.md); [PLAY.md](PLAY.md) is the earlier manual pass. The
+hardware pass — splash,
 haptics, back button, saves, audio — is [DEVICE-CHECK.md](DEVICE-CHECK.md); hold
 the build stamp on the title card to open the in-game **DEVICE CHECK** panel that
-it refers to. The public privacy policy is
-[`docs/privacy.html`](docs/privacy.html); [`.github/workflows/pages.yml`](.github/workflows/pages.yml)
-publishes it to GitHub Pages when `main` is pushed.
+it refers to. The privacy policy source is
+[`docs/privacy.html`](docs/privacy.html); the
+[Pages workflow](.github/workflows/pages.yml) is committed, but the canonical
+URL still needs the one-time Settings → Pages → Source: GitHub Actions step and
+currently returns 404.
 
 ## What makes it different
 
@@ -71,7 +75,7 @@ publishes it to GitHub Pages when `main` is pushed.
 
 ## The season
 
-Fifteen regular weeks against a fifteen-team league, top four make the playoffs, then a semifinal and
+Fifteen regular weeks against a sixteen-club league, top four make the playoffs, then a semifinal and
 the Gridiron Bowl. Win or lose, the offseason brings a scouting report: five prospects, one pick,
 and somebody on your roster has to go. Then training camp, tape upgrades, and a new year.
 

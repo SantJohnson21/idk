@@ -35,7 +35,7 @@ BUILD A CLUB
 Sixteen clubs, each with its own offense, defense and kicking grades. Repaint yours in the club editor: city, nickname, abbreviation and all five broadcast colours. The end zone, jerseys, HUD, crowd and badge follow you.
 
 A FULL SEASON
-Fifteen regular weeks against a fifteen-team league. Top four make the playoffs, then the Gridiron Bowl. The offseason brings a scouting report, one draft pick, training camp and a new year. Ratings, quirks, history and titles carry over.
+Fifteen regular weeks against a sixteen-club league. Top four make the playoffs, then the Gridiron Bowl. The offseason brings a scouting report, one draft pick, training camp and a new year. Ratings, quirks, history and titles carry over.
 
 EVERY SNAP HAS A STORY
 Eleven quirks bend the simulation — CANNON, BALLHAWK, IRON MAN, CLUTCH, SHOWTIME and more. Weather changes accuracy, footing and kicking. Stars demand touches; feed them or the locker room sours. The market is open all year: sign a veteran with tape, or sell a man you can spare.

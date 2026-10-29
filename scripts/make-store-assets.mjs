@@ -103,6 +103,16 @@ await page.locator('.team-picker').waitFor({ timeout: 8_000 });
 // Highlight the club the next screenshot will actually coach. The previous pass
 // picked up Miami's default and then showed Seattle in the hub.
 await page.locator('.team-card').filter({ hasText: 'SQUALL' }).click();
+// Clicking a card scrolls it into view; reset every scrollable ancestor so the
+// listing shot starts at the top of the league instead of mid-row.
+await page.locator('.team-picker').evaluate((el) => {
+  let node = el;
+  while (node) {
+    node.scrollTop = 0;
+    node = node.parentElement;
+  }
+  window.scrollTo(0, 0);
+});
 await shot('phone-02-clubs.png');
 
 await page.getByRole('button', { name: /COACH THE SQUALL/ }).click();

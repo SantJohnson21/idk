@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-29T03:54:31.572Z",
+  "generatedAt": "2026-10-29T23:15:28.042Z",
   "source": "http://127.0.0.1:4173",
   "viewport": {
     "width": 405,
@@ -18,50 +18,50 @@
       "path": "store/feature-graphic-1024x500.png",
       "width": 1024,
       "height": 500,
-      "bytes": 274162,
-      "sha256": "64d9958f1c9b4ae7f1a50fd95fa0e424f7b58cb78b579c28c0372efd4a2390db"
+      "bytes": 270440,
+      "sha256": "6753ae705015b5935a80a843dafb08d58350b89544b93ebdb77eccf270b6779c"
     },
     {
       "path": "store/screenshots/phone-01-title.png",
       "width": 1080,
       "height": 1920,
-      "bytes": 839417,
-      "sha256": "28a7ea47c7b2c6281d08dc69e58ee7a17c99460286d653f941c754aa0b6ee4af"
+      "bytes": 844113,
+      "sha256": "57f34ad5c0379b03ee428e21fa545ac3f7f1ce32e77cb0b6daff017f7a9c1d40"
     },
     {
       "path": "store/screenshots/phone-02-clubs.png",
       "width": 1080,
       "height": 1920,
-      "bytes": 214824,
-      "sha256": "fb1bea6c31571f60866a590e692695a72d0a108df9b441dc9194797c5181abab"
+      "bytes": 229613,
+      "sha256": "32cb7bdf7c95bc1fabfbe33b1262ac36d986da3bbefa3e3857c54a8783a12954"
     },
     {
       "path": "store/screenshots/phone-03-hub.png",
       "width": 1080,
       "height": 1920,
-      "bytes": 293914,
-      "sha256": "a117ea46becde1c809f3d28d73a53d4db49ae6312b3c9317b7d990b6905b1a2a"
+      "bytes": 295919,
+      "sha256": "8bcb5530a3aa07fe6e43601a08a432f3610f3cfb28dafcbde72535a500d931b6"
     },
     {
       "path": "store/screenshots/phone-04-market.png",
       "width": 1080,
       "height": 1920,
-      "bytes": 151171,
-      "sha256": "1b325b5c38f5ed0d2ceac44471ccce180a97646441236a339c787ac648577c2a"
+      "bytes": 151273,
+      "sha256": "a02f2c836bb2af6c34842096669e9de8c00aff57ea77ccce0569a6540edbd8e6"
     },
     {
       "path": "store/screenshots/phone-05-ready.png",
       "width": 1080,
       "height": 1920,
-      "bytes": 490081,
-      "sha256": "d3d9aa428f17ffef8ed73f3481e45e067d0ca4a23c87ef18a1ccad02e7501d76"
+      "bytes": 483644,
+      "sha256": "58a8ce2b6151228558fa9547bd370e96f62ddb2edb5ee40e65abfe38b862ed63"
     },
     {
       "path": "store/screenshots/phone-06-live.png",
       "width": 1080,
       "height": 1920,
-      "bytes": 477216,
-      "sha256": "ffe521ea79b70426768b7cb3b19d780014f81b1cfda7a5fa5ebfa43523e51108"
+      "bytes": 482637,
+      "sha256": "fc264e178c1ea45c462b6ad82ea1c0837e5404c70577fc1563c3bd795a8efe09"
     }
   ]
 }

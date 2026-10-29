@@ -11,14 +11,14 @@ uploading.
 
 | Check | Measured value |
 | --- | --- |
-| App bundle | [`store/rewind-bowl-1.0.0-v1.aab`](rewind-bowl-1.0.0-v1.aab) exists — **3,430,033 bytes** |
-| AAB SHA-256 | `41a73d0ec07c44e79a715174c8cae141a08fc47593503528c054cb6935cba48e` |
+| App bundle | [`store/rewind-bowl-1.0.0-v1.aab`](rewind-bowl-1.0.0-v1.aab) exists — **3,434,252 bytes**, current and matching `dist/` |
+| AAB SHA-256 | `3747fa0d9f858ffdfbd9f8ba5286dc23932434ed7b4fcea74a0626303dccc51a` |
 | Bundle manifest | package `com.rewindbowl.game` · versionName `1.0.0` · versionCode `1` · targetSdk `36` · compileSdk `36` · minSdk `22` |
 | Build config | [`package.json`](../package.json) version `1.0.0`; [`android/app/build.gradle`](../android/app/build.gradle) `applicationId "com.rewindbowl.game"`, default `versionCode` `1`, `versionName` from `package.json`; [`android/variables.gradle`](../android/variables.gradle) `compileSdkVersion = 36`, `targetSdkVersion = 36`, `minSdkVersion = 22` |
-| Signature | `jarsigner -verify` exits **0** with `jar verified.`; `bundletool validate` exits **0** |
-| Bundle freshness | The JS and CSS extracted from the AAB match [`dist/`](../dist/) by SHA-256 (`index-BoVdXKMP.js` `da67a3f9…2833e`; `index-Bc0M5twh.css` `759e8bdd…5ad6`) — the bundle is not stale |
+| Signature | `jarsigner -verify` exits **0** with `jar verified.`; `unzip -t` exits **0**; `bundletool validate` exits **0** |
+| Bundle freshness | The JS and CSS extracted from the AAB match [`dist/`](../dist/) by SHA-256 (`index-CFRORGl5.js` `43b889b0…13d8f`; `index-BKNC9On1.css` `deb18987…9867`) — the bundle is current |
 | App icon | [`store/icon-512.png`](icon-512.png) exists — **512×512**, 59,662 B |
-| Feature graphic | [`store/feature-graphic-1024x500.png`](feature-graphic-1024x500.png) exists — **1024×500**, 274,162 B |
+| Feature graphic | [`store/feature-graphic-1024x500.png`](feature-graphic-1024x500.png) exists — **1024×500**, 270,440 B |
 | Phone screenshots | six files, all **1080×1920**: [`phone-01-title.png`](screenshots/phone-01-title.png), [`phone-02-clubs.png`](screenshots/phone-02-clubs.png), [`phone-03-hub.png`](screenshots/phone-03-hub.png), [`phone-04-market.png`](screenshots/phone-04-market.png), [`phone-05-ready.png`](screenshots/phone-05-ready.png), [`phone-06-live.png`](screenshots/phone-06-live.png) |
 | Listing limits | App name **15/30**, short description **71/80**, full description **2,292/4,000**, release notes **251/500** characters |
 | Privacy page | [`docs/privacy.html`](../docs/privacy.html) exists (4,066 B) with the contact set to `tronjohnson57@gmail.com`; no placeholder remains |

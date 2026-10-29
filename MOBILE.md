@@ -168,13 +168,15 @@ Included and required for submission:
 - App content → Data safety: no data collected, no data shared (nothing leaves
   the device; there are no analytics or ad SDKs).
 - Ads: no. Target audience: 13+. Content rating: fill the questionnaire.
-- Upload the signed `.aab` from `store/`, review the pre-launch report, then roll out.
+- After `npm run mobile:aab`, upload the signed `.aab` from `store/`, review the pre-launch report, then roll out.
 - Keep the upload key (`android/rewind-bowl-upload.jks`) and its `keystore.properties`
   safe; Play App Signing will hold the distribution key. Losing the upload key is
   recoverable through a Play upload-key reset, but a backup saves the wait.
 - New personal developer accounts must run a closed test with at least 12 opted-in
   testers for 14 continuous days before production access. The full click path,
-  listing copy and declaration answers are in [PLAY.md](PLAY.md).
+  listing copy and declaration answers are in
+  [store/PLAY_CONSOLE_RUNBOOK.md](store/PLAY_CONSOLE_RUNBOOK.md);
+  [PLAY.md](PLAY.md) is the earlier manual pass.
 
 **App Store Connect**
 - Create the app record with bundle id `com.rewindbowl.game`.
@@ -237,21 +239,21 @@ fails when the record no longer matches `dist/`.
 
 | Artifact | Raw | Gzip (text) | SHA-256 |
 | --- | ---: | ---: | --- |
-| `dist/assets/index-BoVdXKMP.js` | 349,773 B | 113,358 B · 113.36 kB | `da67a3f92937a3f1e5d2dce32fdf84b6295e16fb018ad6ac7695f02bfce2833e` |
-| `dist/assets/web-BVONbrTF.js` | 119 B | 126 B · 0.13 kB | `291dbda376809428cc2ea18d3a0ae7d937b518e3215a68b250c203d8d74687d5` |
-| `dist/assets/web-BYZMXQIY.js` | 674 B | 333 B · 0.33 kB | `577d6e492ca60d4bf5229b83e65c04b6e6639ee5eaa8ea85b6819a2db7c07830` |
-| `dist/assets/web-Cts6rR6o.js` | 896 B | 455 B · 0.46 kB | `96387c7d94024016ab752accf1d85c502553cfb8e143309341cf171c99ff0d37` |
-| `dist/assets/index-Bc0M5twh.css` | 47,006 B | 10,410 B · 10.41 kB | `759e8bddfea10f49c6fa9a0ac5293d28dfce6d8ab728fedebe64458850af5ad6` |
-| `dist/index.html` | 905 B | 497 B · 0.50 kB | `fd45a13bac90aeeb834255fe1c950d4db1f124462e84cb7c06937cf9985fca12` |
+| `dist/assets/index-CFRORGl5.js` | 360,832 B | 117,043 B · 117.04 kB | `43b889b0bb742621d03030bf39c1196400372658202012eb20b9750c0a913d8f` |
+| `dist/assets/web-C_bclQQY.js` | 896 B | 456 B · 0.46 kB | `9e406b63ed1868a1c52e461ebb86e62eaf9f3b3c63c19eaeaf7a8483fc0c71e7` |
+| `dist/assets/web-CgXAYsV9.js` | 119 B | 126 B · 0.13 kB | `4f6e34c0204245b88ef38624437349cac78733002a7e0037dfffe5540c878039` |
+| `dist/assets/web-D742FFj4.js` | 674 B | 333 B · 0.33 kB | `68e3e2aadf6b9b2a1df2707bca170dfd846ff19cdf11a9a20858cc5336f739d6` |
+| `dist/assets/index-BKNC9On1.css` | 50,064 B | 10,918 B · 10.92 kB | `deb18987feb24e87e0713aaf34da4311ac3f34f0a9e1a5b3ff4aac30a2149867` |
+| `dist/index.html` | 905 B | 499 B · 0.50 kB | `1f599b3ee103a2cd9a12514e6d0e0ec880bc516675edf185911c20bf44156a77` |
 | `dist/fonts/press-start-2p.woff2` | 12,512 B | _already compressed_ | `afec86997fdaf54af1f59358fa2c1e2a0f1d04146edad18e5cd141d0384a7548` |
 | `dist/fonts/silkscreen-400.woff2` | 8,404 B | _already compressed_ | `e6c72ea4702249202bcdd79d3343057e4e25ef1f04e3fcffd8602ab53b40b4cc` |
 | `dist/fonts/silkscreen-700.woff2` | 7,524 B | _already compressed_ | `5741b7f01a127f40ed70281fa2f686e8fc2cfe241930a120e4d1a1cebe78f995` |
 | `dist/favicon.svg` | 799 B | 283 B · 0.28 kB | `6e4259fa462c07ccd9e6be8b1a3741682374a4da374c7b1da23288a70cf7b21b` |
 
-**JS/CSS/HTML payload:** 399,373 B raw → 125,179 B gzip (125.18 kB).
-**All shipped files:** 428,612 B raw; 125,462 B with the text files above gzipped (fonts are served as-is).
-**Native shells:** `android/app/src/main/assets/public/assets/index-BoVdXKMP.js` matches; `ios/App/App/public/assets/index-BoVdXKMP.js` matches — `da67a3f9…2833e` in `dist`.
-**Native artifact — Google Play AAB:** `store/rewind-bowl-1.0.0-v1.aab` — 3,430,033 B (3.3 MiB), SHA-256 `41a73d0ec07c44e79a715174c8cae141a08fc47593503528c054cb6935cba48e`.
+**JS/CSS/HTML payload:** 413,490 B raw → 129,375 B gzip (129.38 kB).
+**All shipped files:** 442,729 B raw; 129,658 B with the text files above gzipped (fonts are served as-is).
+**Native shells:** `android/app/src/main/assets/public/assets/index-CFRORGl5.js` matches; `ios/App/App/public/assets/index-CFRORGl5.js` matches — `43b889b0…13d8f` in `dist`.
+**Native artifact — Android release bundle:** `android/app/build/outputs/bundle/release/app-release.aab` — 3,434,252 B (3.3 MiB), SHA-256 `3747fa0d9f858ffdfbd9f8ba5286dc23932434ed7b4fcea74a0626303dccc51a`.
 <!-- release-record:end -->
 
 ## What was verified here
@@ -265,12 +267,16 @@ Verified in this workspace:
 - `./gradlew bundleRelease` succeeds with JDK 17 and Android SDK 36 (AGP 8.10.1,
   Gradle 8.11.1); the AAB is signed, targets API 36 and contains the same JS hash
   as `dist`.
-- `jarsigner -verify` exits 0 (`jar verified.`); `bundletool validate` exits 0;
-  `bundletool build-apks --mode=universal` builds an APK whose badging reports
-  `versionCode 1`, `versionName 1.0.0`, `targetSdkVersion 36`, `minSdkVersion 22`.
+- `jarsigner -verify` exits 0 (`jar verified.`); `unzip -t` exits 0;
+  `bundletool validate` exits 0, and `bundletool build-apks --mode=universal`
+  exits 0. The bundle manifest reports `versionCode 1`, `versionName 1.0.0`,
+  `targetSdkVersion 36`, `minSdkVersion 22`.
 - `npm run play:assets` produces six 1080×1920 phone screenshots, a 1024×500
   feature graphic and a 512×512 icon from the production UI; `store/assets.json`
   records their dimensions and SHA-256.
+- `store/rewind-bowl-1.0.0-v1.aab` is a byte-for-byte copy of the signed release
+  bundle (`3747fa0d…ccc51a`, 3,434,252 B); its embedded JS and CSS match
+  `dist/` by SHA-256.
 - The generated resolutions exist for both platforms (136 Android assets,
   13 iOS assets), and the Gradle/Xcode configuration files parse as written.
 - The browser build still runs with the native bridge imported (it no-ops on web).

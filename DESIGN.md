@@ -161,7 +161,7 @@ plays (+12), broken tackles (+7), and drained by turnovers (−6).
 
 ### 5.5 Season and offseason
 
-- 8 weeks, 8 teams, top 4 seeds, semifinal, Gridiron Bowl.
+- 15 weeks, 16 teams, top 4 seeds, semifinal, Gridiron Bowl.
 - Standings, point differential, seed line, and a "road to the bowl" bracket.
 - **Offseason:** every player turns a year older and runs training camp (the age curve above, with
   the biggest movers listed), then a five-prospect scouting report with position-weighted grades

@@ -17,7 +17,7 @@ before 1.0.1. It pairs with [`closed-test-invite.md`](closed-test-invite.md)
 | Version | `1.0.0 (1)` |
 | Package | `com.rewindbowl.game` |
 | Bundle | [`store/rewind-bowl-1.0.0-v1.aab`](rewind-bowl-1.0.0-v1.aab) |
-| AAB SHA-256 | `41a73d0ec07c44e79a715174c8cae141a08fc47593503528c054cb6935cba48e` |
+| AAB SHA-256 | `3747fa0d9f858ffdfbd9f8ba5286dc23932434ed7b4fcea74a0626303dccc51a` |
 | Min / target SDK | 22 / 36 |
 | Track | Closed testing → `closed-1.0.0` |
 
@@ -201,7 +201,7 @@ you defend anything.
 | Test window | `__` → `__` (14 continuous days) |
 | Tester count at day 14 | `__` |
 | Open S1 / S2 at close | `__` / `__` |
-| Build shipped to testers | `1.0.0 (1)`, SHA-256 `41a73d0e…cba48e` |
+| Build shipped to testers | `1.0.0 (1)`, SHA-256 `3747fa0d…ccc51a` |
 | Next build | `__` |
 | Production access requested | `__` |
 

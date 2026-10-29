@@ -6,13 +6,13 @@
   "minSdk": 22,
   "targetSdk": 36,
   "compileSdk": 36,
-  "builtAt": "2026-10-29T03:45:00Z",
+  "builtAt": "2026-10-29T23:07:00Z",
   "artifact": "rewind-bowl-1.0.0-v1.aab",
-  "bytes": 3430033,
-  "sha256": "41a73d0ec07c44e79a715174c8cae141a08fc47593503528c054cb6935cba48e",
+  "bytes": 3434252,
+  "sha256": "3747fa0d9f858ffdfbd9f8ba5286dc23932434ed7b4fcea74a0626303dccc51a",
   "signed": true,
   "signatureCheck": "jarsigner -verify: exit 0, jar verified.",
-  "bundleCheck": "bundletool validate + build-apks --mode=universal: exit 0; targetSdkVersion 36; versionCode 1; versionName 1.0.0",
+  "bundleCheck": "unzip -t: exit 0; bundletool validate: exit 0; bundled JS/CSS hashes match dist (index-CFRORGl5.js 43b889b0..., index-BKNC9On1.css deb18987...)",
   "uploadKey": "android/rewind-bowl-upload.jks",
   "uploadKeyConfig": "android/keystore.properties"
 }
