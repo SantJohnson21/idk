@@ -49,7 +49,7 @@ Answer **No** to every content category:
 - Location sharing: no
 - Purchases or real-money trading: no
 - Ads: no
-- Privacy policy: `https://santjohnson21.github.io/idk/privacy.html` — must return HTTP 200 before submission; the 2026-10-29 live check is still 404
+- Privacy policy: `https://raw.githack.com/SantJohnson21/idk/main/docs/privacy.html` — interim verified-live URL (GET **200**, `text/html`, 3,870 B on 2026-10-29; HEAD 403 at the CDN). Canonical/preferred `https://santjohnson21.github.io/idk/privacy.html` is still **404** pending **Settings → Pages → Source: GitHub Actions**. Data safety answers are unchanged and spot-checked.
 
 The expected outcome is **Everyone / 3+**. The game is football; tackles are
 abstract pixel collisions and there is no injury depiction.

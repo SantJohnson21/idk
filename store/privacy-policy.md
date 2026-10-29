@@ -6,7 +6,7 @@
 
 **Developer contact:** tronjohnson57@gmail.com
 
-**Hosted page (after Pages deploy):** https://santjohnson21.github.io/idk/privacy.html
+**Verified-live interim page:** https://raw.githack.com/SantJohnson21/idk/main/docs/privacy.html (GET 200, text/html, 3,870 B, 2026-10-29; HEAD 403 at the CDN) — **canonical page pending:** https://santjohnson21.github.io/idk/privacy.html (404 until GitHub Pages is enabled).
 
 Rewind Bowl '87 is an offline single-player football game. This policy explains
 what the app does with information. The short version: it does not collect,
