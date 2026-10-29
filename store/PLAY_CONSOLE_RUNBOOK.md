@@ -21,7 +21,7 @@ uploading.
 | Feature graphic | [`store/feature-graphic-1024x500.png`](feature-graphic-1024x500.png) exists — **1024×500**, 274,162 B |
 | Phone screenshots | six files, all **1080×1920**: [`phone-01-title.png`](screenshots/phone-01-title.png), [`phone-02-clubs.png`](screenshots/phone-02-clubs.png), [`phone-03-hub.png`](screenshots/phone-03-hub.png), [`phone-04-market.png`](screenshots/phone-04-market.png), [`phone-05-ready.png`](screenshots/phone-05-ready.png), [`phone-06-live.png`](screenshots/phone-06-live.png) |
 | Listing limits | App name **15/30**, short description **71/80**, full description **2,284/4,000**, release notes **247/500** characters |
-| Privacy page | [`docs/privacy.html`](../docs/privacy.html) exists (3,870 B) with the contact set to `tronjohnson57@gmail.com`; no placeholder remains |
+| Privacy page | [`docs/privacy.html`](../docs/privacy.html) exists (4,066 B) with the contact set to `tronjohnson57@gmail.com`; no placeholder remains |
 | Policy text | [`store/privacy-policy.md`](privacy-policy.md) exists with the same contact in both places |
 | Privacy hosting | [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) publishes [`docs/`](../docs/) to GitHub Pages on pushes to `main`; [`docs/.nojekyll`](../docs/.nojekyll) is present. **Live check 2026-10-29: the canonical URL returns 404 (“Site not found”); the workflow’s authenticated `configure-pages` step reports `Get Pages site failed: Not Found` and cannot create the site (`Resource not accessible by integration`). The public Pages API is rate-limited from this sandbox (403). Do not enter the URL in Play yet — the browser check in FALLBACK shows no public HTML URL currently verifies.** |
 | Declarations file | [`store/data-safety.md`](data-safety.md) exists |
@@ -76,9 +76,14 @@ integration`. Both runs (`40817742903`, `40824702390`) fail at that step.
 policy content. `cdn.jsdelivr.net` and `cdn.statically.io` serve the policy as
 `text/plain`. `htmlpreview.github.io` is a 1,269-byte JavaScript wrapper with no
 policy text in the served HTML. **No public HTML URL currently verifies**; keep
-the canonical URL pending. When the policy is rendered through that preview
-wrapper, the 412 px layout has no horizontal overflow and both mailto links
-work, but the inline links measure only 15 px and 19 px tall.
+the canonical URL pending.
+
+**Local verification 2026-10-29 (412×892):** `docs/privacy.html` was served from
+the repo with `python3 -m http.server 4174 --bind 127.0.0.1 --directory docs`
+and loaded in Chromium. `scrollWidth == innerWidth == 412`; headline, body and
+contact sections present; both hrefs are `mailto:tronjohnson57@gmail.com`; both
+mailing-link boxes are **44 px tall**; the contact click dispatches the mailto
+URL; zero console errors or warnings. Screenshot: `artifacts/privacy-phone.png`.
 
 The missing credential is a **repo-admin user token**. This sandbox has none: no
 `GH_TOKEN`/`GITHUB_TOKEN`, `gh auth status` is logged out, no
@@ -107,7 +112,7 @@ use the Actions `GITHUB_TOKEN`.
 
 **Fallback URL while blocked:**
 <https://raw.githubusercontent.com/SantJohnson21/idk/main/docs/privacy.html>
-returns **200**, `text/plain; charset=utf-8`, 3,870 bytes, and contains the
+returns **200**, `text/plain; charset=utf-8`, 4,066 bytes, and contains the
 contact plus both `mailto:` links. It is not a substitute for the Play-facing
 page: Play expects a browser-readable policy page, and raw text is not the
 canonical `github.io` page. Do not enter the raw URL in Play; keep the canonical

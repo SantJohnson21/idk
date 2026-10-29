@@ -17,6 +17,15 @@
   h2 { margin: 38px 0 8px; font-size: 15px; letter-spacing: .12em; color: var(--gold); }
   p, li { color: #cdd7cc; }
   a { color: var(--gold); }
+  @media (max-width: 600px) {
+    a[href^="mailto:"] {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 2px;
+      vertical-align: middle;
+    }
+  }
   .meta { color: var(--dim); font-size: 13px; border-bottom: 1px solid var(--line); padding-bottom: 22px; }
   .card { background: var(--panel); border: 1px solid var(--line); padding: 16px 18px; margin: 24px 0; }
   .card strong { color: var(--text); }
