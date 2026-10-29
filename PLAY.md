@@ -118,11 +118,13 @@ This is the step that catches most new personal accounts.
 2. **Create new release**, upload `store/rewind-bowl-1.0.0-v1.aab`.
 3. Accept **Play App Signing** when prompted. The AAB already carries the upload
    signature; Google re-signs the distributed APKs with the app-signing key.
-4. Add release notes (the block at the bottom of `store/listing.md`), save, review
-   and **Start rollout to Closed testing**.
+4. Add the release notes from
+   [`store/closed-test-invite.md`](store/closed-test-invite.md), save, review and
+   **Start rollout to Closed testing**.
 5. Open the **Testers** tab → **Create email list** → add at least 12 Google
-   accounts (your own plus testers). Save, then copy the **opt-in URL** and send it
-   to them. Each tester must open it, accept, and install the build.
+   accounts (your own plus testers). Save, copy the **opt-in URL**, and send the
+   invitation from [`store/closed-test-invite.md`](store/closed-test-invite.md).
+   Each tester must open it, accept, and install the build.
 6. Keep at least 12 testers opted in for **14 consecutive days**. Removing one
    drops the count; add a spare if you are close to the line.
 
