@@ -239,20 +239,20 @@ fails when the record no longer matches `dist/`.
 
 | Artifact | Raw | Gzip (text) | SHA-256 |
 | --- | ---: | ---: | --- |
-| `dist/assets/index-Ckq8jAo1.js` | 361,103 B | 117,105 B · 117.11 kB | `68d636b62a2dfebbe353defd7cbbc33caefe70c785fb4e93715796d8fc7194e0` |
-| `dist/assets/web-BXi8nQss.js` | 674 B | 332 B · 0.33 kB | `1aa9eb7ca6c24410c5878c7c7993a2b411606214872de5ea10925c978d9d9efc` |
-| `dist/assets/web-DtPt3xEb.js` | 896 B | 455 B · 0.46 kB | `0a439bda7ef2510c2551a4e04bdd97a84d5e89ddeba475cb2c76543b67f189ce` |
-| `dist/assets/web-F0x4FPNn.js` | 119 B | 126 B · 0.13 kB | `9335a03c0fa6ee775d785e3793c48d2cd908e721e293a1cdbfa1d36b1230313c` |
+| `dist/assets/index-BBMuigmK.js` | 361,493 B | 117,290 B · 117.29 kB | `7d0f6e4304c5991332f86f2edb3863c090c3acfd7b3775bcd24b1a5c0701f55c` |
+| `dist/assets/web-BcE0nZlE.js` | 674 B | 331 B · 0.33 kB | `8659a105c4845ae652fedd3118eed6d3ec8472be5f36e30e21bd98510899d20b` |
+| `dist/assets/web-Dz8qgFw2.js` | 119 B | 125 B · 0.13 kB | `0b3ecab526efd4ddd78ea0e6c8bffc14610f2359fa6dd251f73a9d3605e135ba` |
+| `dist/assets/web-kI_sC9OB.js` | 896 B | 454 B · 0.45 kB | `5efe10a9f3775738a0f5644c769d6afa8058e8d7470377028bfc140d0e5e7518` |
 | `dist/assets/index-Cwx5ExvI.css` | 50,249 B | 10,945 B · 10.95 kB | `69cbdc9e829032df4c99e233a9dd8e4baef52d000e541d825dbacdfe567b063f` |
-| `dist/index.html` | 905 B | 498 B · 0.50 kB | `46e8ac7208bf0e861540b953511bbfd3bc84b61fa35f26d14481906b0a7bae42` |
+| `dist/index.html` | 905 B | 497 B · 0.50 kB | `d8cf5a4260e6696ef33d6b094d503eb358ab4f70329c5de8950b878bf3beb9c4` |
 | `dist/fonts/press-start-2p.woff2` | 12,512 B | _already compressed_ | `afec86997fdaf54af1f59358fa2c1e2a0f1d04146edad18e5cd141d0384a7548` |
 | `dist/fonts/silkscreen-400.woff2` | 8,404 B | _already compressed_ | `e6c72ea4702249202bcdd79d3343057e4e25ef1f04e3fcffd8602ab53b40b4cc` |
 | `dist/fonts/silkscreen-700.woff2` | 7,524 B | _already compressed_ | `5741b7f01a127f40ed70281fa2f686e8fc2cfe241930a120e4d1a1cebe78f995` |
 | `dist/favicon.svg` | 799 B | 283 B · 0.28 kB | `6e4259fa462c07ccd9e6be8b1a3741682374a4da374c7b1da23288a70cf7b21b` |
 
-**JS/CSS/HTML payload:** 413,946 B raw → 129,461 B gzip (129.46 kB).
-**All shipped files:** 443,185 B raw; 129,744 B with the text files above gzipped (fonts are served as-is).
-**Native shells:** `android/app/src/main/assets/public/assets/index-Ckq8jAo1.js` missing; `ios/App/App/public/assets/index-Ckq8jAo1.js` missing — `68d636b6…194e0` in `dist`.
+**JS/CSS/HTML payload:** 414,336 B raw → 129,642 B gzip (129.64 kB).
+**All shipped files:** 443,575 B raw; 129,925 B with the text files above gzipped (fonts are served as-is).
+**Native shells:** `android/app/src/main/assets/public/assets/index-BBMuigmK.js` missing; `ios/App/App/public/assets/index-BBMuigmK.js` missing — `7d0f6e43…1f55c` in `dist`.
 _No native artifact was stamped for this web-only record._
 <!-- release-record:end -->
 

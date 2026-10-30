@@ -17,6 +17,7 @@ import { PLAYBOOK, type PlayDef, type RouteKey, type RouteSlot } from './playboo
 import { PlaySim, type SimInput } from './play';
 import { Rng, clamp } from './rng';
 import {
+  ballhawkTakeawayBonus,
   emptyStatLine,
   getTeam,
   opponentStrength,
@@ -1254,6 +1255,9 @@ export class Match {
         Math.max(1, this.franchise.roster.filter((p) => ['DL', 'LB', 'CB', 'S'].includes(p.pos)).length),
       kick: s.kick,
       clock: this.state.clock,
+      // A BALLHAWK in the secondary jumps a route now and then; the roster's
+      // defenders are otherwise only a team rating on this side of the ball.
+      takeawayBonus: ballhawkTakeawayBonus(this.franchise.roster),
     });
     this.driveRevealed = 0;
     this.driveApplied = false;

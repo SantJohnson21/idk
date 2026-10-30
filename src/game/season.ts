@@ -640,6 +640,23 @@ export function moraleMod(morale: number): number {
 // Simulated opponent drives (our defense is coaching, not button-mashing)
 // ---------------------------------------------------------------------------
 
+/** The spots a BALLHAWK can actually play. A receiver with the trait does nothing. */
+const DEFENSIVE_POS: Pos[] = ['DL', 'LB', 'CB', 'S'];
+/**
+ * What one BALLHAWK defender adds to the chance an opponent drive dies on a
+ * takeaway: 2.5 points on a 4% base, capped at three defenders (+7.5). One hawk
+ * is a real upgrade (4% → 6.5% per drive), a secondary full of them is a unit.
+ */
+export const BALLHAWK_TAKEAWAY = 0.025;
+export const BALLHAWK_TAKEAWAY_CAP = 0.075;
+
+export function ballhawkTakeawayBonus(roster: Player[]): number {
+  const hawks = roster.filter(
+    (p) => p.quirk === 'ballhawk' && DEFENSIVE_POS.includes(p.pos),
+  ).length;
+  return Math.min(BALLHAWK_TAKEAWAY_CAP, hawks * BALLHAWK_TAKEAWAY);
+}
+
 export interface OppDriveOptions {
   rng: Rng;
   startSpot: number; // their own field position, 0..100
@@ -647,6 +664,8 @@ export interface OppDriveOptions {
   ourDef: number;
   kick: number;
   clock: number;
+  /** Extra per-play takeaway chance from BALLHAWK defenders, 0..0.075. */
+  takeawayBonus?: number;
 }
 
 export function simulateOpponentDrive(opts: OppDriveOptions): OpponentDrive {
@@ -663,6 +682,7 @@ export function simulateOpponentDrive(opts: OppDriveOptions): OpponentDrive {
   let turnover = false;
   let touchdown = false;
   const edge = clamp((opts.theirOff - opts.ourDef) / 9, -3.2, 3.2);
+  const takeawayBonus = clamp(opts.takeawayBonus ?? 0, 0, BALLHAWK_TAKEAWAY_CAP);
 
   const log = (kind: DrivePlay['kind'], text: string, yards: number) => {
     plays.push({ down, toGo, spot, text, yards, kind });
@@ -700,6 +720,15 @@ export function simulateOpponentDrive(opts: OppDriveOptions): OpponentDrive {
         plays[plays.length - 1].spot = spot;
         break;
       }
+    }
+
+    // BALLHAWK: a defender jumps the route before the play is run. This is an
+    // extra, independent roll, so a roster with no hawk plays exactly as before.
+    if (takeawayBonus > 0 && rng.chance(takeawayBonus)) {
+      turnover = true;
+      log('turnover', rng.chance(0.55) ? 'INTERCEPTED' : 'STRIPPED', 0);
+      timeUsed += 1;
+      break;
     }
 
     const playTime = rng.range(4.2, 7.8);

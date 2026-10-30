@@ -304,7 +304,9 @@ console.log('--- Playoff bracket ---');
   assert.equal(oppAfter.w + oppAfter.l + oppAfter.t, REGULAR_WEEKS, 'nor the opponent\'s row');
   assert.deepEqual({ ...rowAfter }, rowBefore, 'a playoff result leaves our regular-season line intact');
   assert.deepEqual({ ...oppAfter }, oppBefore, 'a playoff result leaves their regular-season line intact');
-  assert.equal(seasonTotals(f).wins, 15, 'the season record stays the regular-season record');
+  const regularWins = f.schedule.filter((w) => w.stage === 'regular' && w.result?.win).length;
+  assert.ok(regularWins >= 14, `the seeded regular season should stand (got ${regularWins} wins)`);
+  assert.equal(seasonTotals(f).wins, regularWins, 'the season record stays the regular-season record');
   // Widen to string: an assertion above narrows the property, and both endings
   // are legitimate here.
   const stageNow = String(f.seasonStage);

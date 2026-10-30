@@ -140,6 +140,13 @@ export class PlaySim {
   readonly los: number;
   readonly startSpot: number;
   readonly weather: WeatherInfo;
+  /**
+   * Footing, from the weather: 1 on a dry field, 0.98 rain/fog, 0.94 snow. It
+   * slows the man carrying the ball — the cut that does not quite plant — rather
+   * than the whole sim, which would only make the game run slower at the same
+   * relative speed.
+   */
+  private readonly footing: number;
   readonly rng: Rng;
   readonly team: TeamInfo;
   readonly opp: TeamInfo;
@@ -192,6 +199,7 @@ export class PlaySim {
     this.los = cfg.los;
     this.startSpot = cfg.startSpot;
     this.weather = cfg.weather;
+    this.footing = clamp(1 + cfg.weather.speedMod, 0.9, 1);
     this.rng = new Rng(cfg.seed);
     this.team = cfg.team;
     this.opp = cfg.opp;
@@ -1619,7 +1627,7 @@ export class PlaySim {
     const staminaFactor = (0.8 + (carrier.stamina / 100) * 0.2) * (this.carryFromPass ? 0.96 : 1.02);
     const surge = carrier.surge > 0 ? 1.34 : 1;
     const sprint = input.sprint ? 1.08 : 1;
-    let speed = carrier.speed * staminaFactor * surge * sprint;
+    let speed = carrier.speed * staminaFactor * surge * sprint * this.footing;
     let tx = carrier.x + 8;
     let ty = carrier.y;
     if (mag > 0.16) {

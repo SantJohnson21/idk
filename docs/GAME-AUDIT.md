@@ -37,8 +37,8 @@ implemented, or implemented but not verified here.
 | **Hype, burst, audible** | EXERCISED / **FIXED** | `match.burst` / `audible`; fixed: a tap on the field while carrying spent 34 hype with no cost on screen (`carry-tap.test.tsx`) |
 | **Your club, your colours** | EXERCISED | `club.ts`; `sim.test.ts` *Choosing a club, and editing it*; editor reachable from the hub |
 | **Ego and morale** | EXERCISED (indirect) | `applyMorale` after every game and `play.ts` applies morale to ratings; the season playthrough runs it, the roster screens show it |
-| **Quirks** | EXERCISED except one (**GAP**) | Ten traits are read by `play.ts` / `match.ts`; **BALLHAWK has no simulation reference** — see gaps |
-| **Weather** | PARTIAL (**GAP**) | Accuracy, catch and kick modifiers are applied and the renderer paints each state; **`speedMod` (footing) is never read** — see gaps |
+| **Quirks** | EXERCISED | All eleven are read by the simulation. BALLHAWK now jumps a route on opponent drives — see fixed defects for the numbers |
+| **Weather** | EXERCISED | Accuracy, catch and kick modifiers are applied, footing slows the ball carrier (rain/fog −2%, snow −6%), and the renderer paints each state — see fixed defects |
 | **Halftime reel** | EXERCISED | `film.ts`, `match.startReel` / `reelNext`; `sim.test.ts` *Halftime reel* |
 | **Big moments stretch** | EXERCISED | `match.requestSlowmo`; `sim.test.ts` *Slow motion setting* |
 | **The market** | EXERCISED | `market.ts`; `sim.test.ts` *The market*; buy/sell wired in `HubScreen` |
@@ -66,16 +66,25 @@ implemented, or implemented but not verified here.
    The tap no longer bursts; the `BURST 34` button and `B`/space still do. Pinned
    by `carry-tap.test.tsx`, which drives a real handoff and taps the canvas
    (reverting the fix fails with `expected 46 to be 80`).
+3. **BALLHAWK was decoration.** The quirk was priced on the market and printed on
+   the roster, but no simulation read it. Each BALLHAWK in a defensive spot
+   (`DL`, `LB`, `CB`, `S`) now adds 2.5 percentage points to an independent
+   per-play takeaway roll on every simulated opponent drive: the base 4% becomes
+   6.5% with one hawk, and three or more cap it at 11.5%. Measured on 240 matched
+   drives: natural rosters 73 takeaways / 492 points allowed, all-hawk rosters
+   114 / 320. Pinned by `traits.test.ts`; deleting the pass-through in
+   `Match.startDefense` fails with
+   `BALLHAWK should produce more takeaways (plain 61, hawks 61)`.
+4. **Weather footing was defined but never used.** The ball carrier's top speed is
+   now multiplied by `1 + weather.speedMod`: −2% in rain and fog, −6% in snow
+   (clear, night and wind unchanged). It applies to handoffs, scrambles and
+   after-catch runs — the cut that does not quite plant. Measured over 48
+   identical handoffs: 92 clear / 83 rain / 76 snow rushing yards. Removing the
+   multiplier fails with
+   `rain footing should cost rushing yards (clear 92, rain 92)`.
 
 ## Remaining gaps (not silently dropped)
 
-- **BALLHAWK does nothing in the sim.** The quirk exists in `data.ts`, affects
-  market pricing and is displayed on players, but no simulation code reads it.
-  Our defense is simulated drive-by-drive at team level, so an individual
-  defender's quirk has nowhere to act yet.
-- **Weather footing (`speedMod`) is unused.** Rain, snow and fog change accuracy,
-  catching and kicking; the footing modifier is defined but never applied to
-  movement. The README's "footing" claim is therefore only partly true.
 - **Visibility in fog/snow is presentation only.** The renderer dims the field
   and draws weather, but the sim does not restrict which receivers/defenders the
   player can read; the bias comes from accuracy and catch modifiers.
@@ -97,11 +106,13 @@ implemented, or implemented but not verified here.
 ```bash
 npm ci
 npm run build                      # tsc --noEmit + vite build
-npm test                           # sim, season playthrough, UI guards, store tooling
+npm test                           # sim, season playthrough, trait wiring, UI guards, store tooling
 npm run release:record:check       # MOBILE.md matches the current dist/
 ```
 
 `src/game/season.test.ts` is the season-level harness: it plays every scheduled
 week as a real `Match`, files the result through `finishGame`, writes and reloads
 a save slot between weeks, walks the offseason into a second year, and then plays
-a forced-bracket semifinal to pin the standings rule.
+a forced-bracket semifinal to pin the standings rule. `src/game/traits.test.ts`
+compares matched seeds with and without a mechanic, so deleting either wiring
+leaves the totals identical and fails the directional assertion.
