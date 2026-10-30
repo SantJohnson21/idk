@@ -401,8 +401,14 @@ export function advanceAfterGame(franchise: Franchise, win: boolean, tie: boolea
   if (week.stage !== 'regular' && (tie || ourScore === theirScore)) return;
   week.result = { our: ourScore, theirs: theirScore, win, tie };
   const oppId = week.opponentId;
-  addStanding(franchise, franchise.teamId, win, tie, ourScore, theirScore);
-  addStanding(franchise, oppId, !win && !tie, tie, theirScore, ourScore);
+  // The standings are the regular-season table. A playoff result belongs to the
+  // bracket: counting it here padded a club's row by every postseason game, so a
+  // 10-5 team read 13-5 after a run and the table could reshuffle after the field
+  // was already set.
+  if (week.stage === 'regular') {
+    addStanding(franchise, franchise.teamId, win, tie, ourScore, theirScore);
+    addStanding(franchise, oppId, !win && !tie, tie, theirScore, ourScore);
+  }
 
   const rng = new Rng(Date.now() % 65535 + franchise.week * 131 + franchise.season * 17);
   if (week.stage === 'regular') {

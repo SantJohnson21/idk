@@ -8,7 +8,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "tsx src/game/sim.test.ts && npm run test:ui && node --test tools/play-publish.test.mjs tools/play-publish.http.test.mjs tools/play-promote.http.test.mjs",
+    "test": "tsx src/game/sim.test.ts && tsx src/game/season.test.ts && npm run test:ui && node --test tools/play-publish.test.mjs tools/play-publish.http.test.mjs tools/play-promote.http.test.mjs",
     "release:record": "node scripts/release-record.mjs",
     "release:record:check": "node scripts/release-record.mjs --check",
     "play:assets": "node scripts/make-store-assets.mjs",
@@ -30,7 +30,7 @@
     "mobile:apk": "npm run mobile:sync && cd android && ./gradlew assembleDebug && cd .. && node scripts/release-record.mjs --artifact android/app/build/outputs/apk/debug/app-debug.apk --label 'Android debug APK'",
     "mobile:aab": "npm run mobile:sync && cd android && ./gradlew bundleRelease && cd .. && npm run play:validate && node scripts/release-record.mjs --artifact android/app/build/outputs/bundle/release/app-release.aab --label 'Android release bundle'",
     "mobile:ipa": "npm run mobile:sync && cd ios/App && xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -archivePath build/App.xcarchive archive && xcodebuild -exportArchive -archivePath build/App.xcarchive -exportPath build/export -exportOptionsPlist ../ExportOptions.plist && cd ../.. && node scripts/release-record.mjs --artifact 'ios/App/build/export/*.ipa' --label 'iOS archive'",
-    "test:ui": "vitest run src/ui/fourth-down-rewind.test.tsx src/ui/result-deck-rewind.test.tsx",
+    "test:ui": "vitest run src/ui/fourth-down-rewind.test.tsx src/ui/result-deck-rewind.test.tsx src/ui/carry-tap.test.tsx",
     "play:validate": "node tools/play-publish.mjs --dry-run --bundle android/app/build/outputs/bundle/release/app-release.aab"
   },
   "dependencies": {

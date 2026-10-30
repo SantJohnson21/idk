@@ -444,9 +444,10 @@ export function GameScreen({
         // standing nearer the tap than the quarterback keeps the throw.
         if (m.sim.tapIntent(f.x, f.y, r.tapRadiusYards()) === 'qb') m.scramble();
         else m.throwAt(f.x, f.y);
-      } else if (m.sim.phase === 'carry') {
-        m.burst();
       }
+      // A tap while carrying is not a burst. The deck prints BURST 34 next to the
+      // button that spends the hype; a stray thumb on the field was buying one
+      // silently, mid-run, for a cost it never showed.
     }
   };
 

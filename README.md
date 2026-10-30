@@ -134,4 +134,6 @@ resources/       icon + splash masters (drawn by scripts/make-assets.mjs)
 No art or audio files beyond three bundled fonts: the field, players, crowd, effects and
 soundtrack are drawn and synthesized at runtime, so the game ships as code plus ~90 KB of font.
 
-See [DESIGN.md](DESIGN.md) for the design document.
+See [DESIGN.md](DESIGN.md) for the design document, and
+[docs/GAME-AUDIT.md](docs/GAME-AUDIT.md) for the feature-by-feature audit: what the
+code implements, what the tests actually pin, and what is still missing.
