@@ -3200,6 +3200,69 @@ console.log('--- Hot routes at the line ---');
   );
 }
 
+console.log('--- Rewind from the fourth-down deck ---');
+{
+  // The tape matters most here: a failed third down leaves the drive alive until
+  // the fourth-down call, and the snapshot has to survive into that deck. The UI
+  // renders the button from canRewind(), so the engine contract is what this pins:
+  // the snapshot survives, rewind is accepted, and the whole pre-snap board returns.
+  const { match } = makeMatch(91);
+  match.state.down = 3;
+  match.state.toGo = 30;
+  match.state.spot = 50;
+  match.state.clock = 60;
+  const tokens = match.state.rewinds;
+  const pre = {
+    down: match.state.down,
+    toGo: match.state.toGo,
+    spot: match.state.spot,
+    clock: match.state.clock,
+    us: match.state.scoreUs,
+    them: match.state.scoreThem,
+  };
+  const runCard = PLAYBOOK.find((p) => p.kind === 'run');
+  assert.ok(runCard, 'the playbook should hold a run');
+  match.choosePlay(runCard!.id, runCard!);
+  let threw = false;
+  let guard = 0;
+  while (match.phase !== 'result' && guard++ < 60_000) {
+    const sim = match.sim;
+    if (sim && sim.phase === 'dropback' && sim.isPass && !threw && sim.elapsed > 1.9) {
+      const reads = sim.getReads().sort((a, b) => b.percent - a.percent);
+      if (reads[0]) {
+        match.throwAt(reads[0].projected.x, reads[0].projected.y);
+        threw = true;
+      }
+    }
+    match.update(1 / 60);
+  }
+  assert.equal(match.phase, 'result', 'the third-down snap should resolve');
+  const logAfterSnap = match.playLog.length;
+  match.advance();
+  assert.equal(match.phase, 'fourth', 'a failed third down should ask the fourth-down question');
+  assert.equal(match.state.down, 4, 'and the board should read fourth down');
+  assert.equal(match.canRewind(), true, 'the tape should stay armed on the fourth-down deck');
+
+  assert.equal(match.rewind(), true, 'rewind should be accepted from the fourth-down deck');
+  assert.equal(match.phase, 'playcall', 'and the deck should go back to calling a play');
+  assert.equal(match.state.rewinds, tokens - 1, 'for one token');
+  assert.equal(match.state.down, pre.down, 'the down is the one the snap started on');
+  assert.equal(match.state.toGo, pre.toGo, 'with the distance');
+  assert.equal(match.state.spot, pre.spot, 'and the spot');
+  assert.equal(match.state.clock, pre.clock, 'the clock rolled back too');
+  assert.equal(match.state.scoreUs, pre.us, 'the scoreboard never saw the snap');
+  assert.equal(match.state.scoreThem, pre.them);
+  assert.equal(match.playLog.length, logAfterSnap - 1, 'the undone snap leaves the drive log');
+  assert.equal(match.lastOutcome, undefined, 'and leaves no headline behind');
+  assert.equal(match.canRewind(), false, 'the chain stays closed until the next snap');
+
+  match.choosePlay(match.cards[0].id);
+  assert.equal(match.phase, 'ready', 'the fourth-down call can be made a second time');
+  console.log(
+    `  third-and-30 -> 4th down -> rewind -> ${match.state.down}&${match.state.toGo} at ${match.state.spot} · ${match.state.rewinds} token left`,
+  );
+}
+
 console.log('--- Save slots ---');
 {
   const store = new Map<string, string>();

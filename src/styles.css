@@ -3409,6 +3409,26 @@ ul {
   gap: 6px;
 }
 
+/* The tape stays on the deck here: a failed third down is the snap most worth
+   taking back, so the button sits under the three calls rather than behind one. */
+.fourth-rewind {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.fourth-rewind .pbtn {
+  flex: none;
+  min-height: 34px;
+  padding: 7px 10px;
+  font-size: 9px;
+}
+
+.fourth-rewind small {
+  line-height: 1.3;
+}
+
 .fourth-card {
   display: flex;
   flex-direction: column;

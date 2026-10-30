@@ -880,6 +880,16 @@ export function GameScreen({
                   <small>{m.canGoForFieldGoal ? 'Legs only. Hit the meter.' : 'Out of range'}</small>
                 </button>
               </div>
+              {m.canRewind() && (
+                <div className="fourth-rewind">
+                  <PixelButton variant="gold" tick={false} onClick={() => m.rewind()}>
+                    ◀◀ REWIND ({m.state.rewinds})
+                  </PixelButton>
+                  <small className="dim">
+                    Undo that snap. The down, the spot and the clock come back with it.
+                  </small>
+                </div>
+              )}
             </div>
           )}
 
