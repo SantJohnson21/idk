@@ -8,7 +8,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "tsx src/game/sim.test.ts && node --test tools/play-publish.test.mjs tools/play-publish.http.test.mjs tools/play-promote.http.test.mjs",
+    "test": "tsx src/game/sim.test.ts && vitest run src/ui/fourth-down-rewind.test.tsx && node --test tools/play-publish.test.mjs tools/play-publish.http.test.mjs tools/play-promote.http.test.mjs",
     "release:record": "node scripts/release-record.mjs",
     "release:record:check": "node scripts/release-record.mjs --check",
     "play:assets": "node scripts/make-store-assets.mjs",
@@ -29,7 +29,8 @@
     "mobile:logs": "adb logcat -v time chromium:V Capacitor/Console:V Capacitor:V '*:S'",
     "mobile:apk": "npm run mobile:sync && cd android && ./gradlew assembleDebug && cd .. && node scripts/release-record.mjs --artifact android/app/build/outputs/apk/debug/app-debug.apk --label 'Android debug APK'",
     "mobile:aab": "npm run mobile:sync && cd android && ./gradlew bundleRelease && cd .. && node scripts/release-record.mjs --artifact android/app/build/outputs/bundle/release/app-release.aab --label 'Android release bundle'",
-    "mobile:ipa": "npm run mobile:sync && cd ios/App && xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -archivePath build/App.xcarchive archive && xcodebuild -exportArchive -archivePath build/App.xcarchive -exportPath build/export -exportOptionsPlist ../ExportOptions.plist && cd ../.. && node scripts/release-record.mjs --artifact 'ios/App/build/export/*.ipa' --label 'iOS archive'"
+    "mobile:ipa": "npm run mobile:sync && cd ios/App && xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -archivePath build/App.xcarchive archive && xcodebuild -exportArchive -archivePath build/App.xcarchive -exportPath build/export -exportOptionsPlist ../ExportOptions.plist && cd ../.. && node scripts/release-record.mjs --artifact 'ios/App/build/export/*.ipa' --label 'iOS archive'",
+    "test:ui": "vitest run src/ui/fourth-down-rewind.test.tsx"
   },
   "dependencies": {
     "@capacitor/android": "^6.2.2",
@@ -45,13 +46,17 @@
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^6.2.2",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
     "@types/node": "^22.20.5",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
     "@vitejs/plugin-react": "4.3.4",
+    "jsdom": "^25.0.1",
     "playwright": "^1.48.2",
     "tsx": "4.19.2",
     "typescript": "5.6.3",
-    "vite": "5.4.11"
+    "vite": "5.4.11",
+    "vitest": "^2.1.9"
   }
 }
