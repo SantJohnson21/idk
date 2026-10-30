@@ -168,12 +168,23 @@ cp android/app/build/outputs/bundle/release/app-release.aab \
    store/rewind-bowl-1.0.0-v1.aab
 ```
 
+`npm run mobile:aab` ends with `npm run play:validate`, which is
+`tools/play-publish.mjs --dry-run` pointed at the bundle Gradle just wrote. A
+bundle with an unreadable manifest, the wrong package, or no signed-in service
+account fails the build before the build record is stamped. The key is
+`store/play-service-account.json` or `$PLAY_SERVICE_ACCOUNT_JSON`.
+
+To build a bundle without Play credentials, `cd android && ./gradlew
+bundleRelease` still works; that artifact is unvalidated, and
+`npm run play:validate` can check it once a key exists.
+
 `npm run mobile:aab` uses `android/keystore.properties`. Without it the release
 build is unsigned and Play will reject it.
 
 Validate a bundle before upload:
 
 ```bash
+npm run play:validate        # Play dry run on the build output
 java -jar bundletool.jar validate --bundle=store/rewind-bowl-1.0.0-v1.aab
 jarsigner -verify store/rewind-bowl-1.0.0-v1.aab
 ```

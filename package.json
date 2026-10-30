@@ -28,9 +28,10 @@
     "mobile:live:ios": "cap run ios --live-reload --host localhost --port 3000",
     "mobile:logs": "adb logcat -v time chromium:V Capacitor/Console:V Capacitor:V '*:S'",
     "mobile:apk": "npm run mobile:sync && cd android && ./gradlew assembleDebug && cd .. && node scripts/release-record.mjs --artifact android/app/build/outputs/apk/debug/app-debug.apk --label 'Android debug APK'",
-    "mobile:aab": "npm run mobile:sync && cd android && ./gradlew bundleRelease && cd .. && node scripts/release-record.mjs --artifact android/app/build/outputs/bundle/release/app-release.aab --label 'Android release bundle'",
+    "mobile:aab": "npm run mobile:sync && cd android && ./gradlew bundleRelease && cd .. && npm run play:validate && node scripts/release-record.mjs --artifact android/app/build/outputs/bundle/release/app-release.aab --label 'Android release bundle'",
     "mobile:ipa": "npm run mobile:sync && cd ios/App && xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -archivePath build/App.xcarchive archive && xcodebuild -exportArchive -archivePath build/App.xcarchive -exportPath build/export -exportOptionsPlist ../ExportOptions.plist && cd ../.. && node scripts/release-record.mjs --artifact 'ios/App/build/export/*.ipa' --label 'iOS archive'",
-    "test:ui": "vitest run src/ui/fourth-down-rewind.test.tsx src/ui/result-deck-rewind.test.tsx"
+    "test:ui": "vitest run src/ui/fourth-down-rewind.test.tsx src/ui/result-deck-rewind.test.tsx",
+    "play:validate": "node tools/play-publish.mjs --dry-run --bundle android/app/build/outputs/bundle/release/app-release.aab"
   },
   "dependencies": {
     "@capacitor/android": "^6.2.2",

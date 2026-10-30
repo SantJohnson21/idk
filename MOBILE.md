@@ -235,25 +235,25 @@ number. The version comes from `package.json`. `npm run release:record:check`
 fails when the record no longer matches `dist/`.
 
 <!-- release-record:start -->
-### 2026-10-29 · 1.0.0
+### 2026-10-30 · 1.0.0
 
 | Artifact | Raw | Gzip (text) | SHA-256 |
 | --- | ---: | ---: | --- |
-| `dist/assets/index-CFRORGl5.js` | 360,832 B | 117,043 B · 117.04 kB | `43b889b0bb742621d03030bf39c1196400372658202012eb20b9750c0a913d8f` |
-| `dist/assets/web-C_bclQQY.js` | 896 B | 456 B · 0.46 kB | `9e406b63ed1868a1c52e461ebb86e62eaf9f3b3c63c19eaeaf7a8483fc0c71e7` |
-| `dist/assets/web-CgXAYsV9.js` | 119 B | 126 B · 0.13 kB | `4f6e34c0204245b88ef38624437349cac78733002a7e0037dfffe5540c878039` |
-| `dist/assets/web-D742FFj4.js` | 674 B | 333 B · 0.33 kB | `68e3e2aadf6b9b2a1df2707bca170dfd846ff19cdf11a9a20858cc5336f739d6` |
-| `dist/assets/index-BKNC9On1.css` | 50,064 B | 10,918 B · 10.92 kB | `deb18987feb24e87e0713aaf34da4311ac3f34f0a9e1a5b3ff4aac30a2149867` |
-| `dist/index.html` | 905 B | 499 B · 0.50 kB | `1f599b3ee103a2cd9a12514e6d0e0ec880bc516675edf185911c20bf44156a77` |
+| `dist/assets/index-C_LtyL8R.js` | 361,119 B | 117,109 B · 117.11 kB | `d54b28d3e2d26c5fcd56935fa2084c8e9ce48d3a69c9ff2ca18738c2380676cf` |
+| `dist/assets/web-BopPDL3e.js` | 119 B | 126 B · 0.13 kB | `55850a72f683d4249f0d42254d9012cf6d5bbaf79cec3f121def4c4adb226d39` |
+| `dist/assets/web-bVQB81PH.js` | 674 B | 333 B · 0.33 kB | `5c4ef84f15411becdacab27614889259fbde6e00b06e8164cf013fdd295a010b` |
+| `dist/assets/web-DPBvxvkP.js` | 896 B | 455 B · 0.46 kB | `aecb9b439601a4430202d23e9c203222ceab0b003df97bcb96a70e1e7fd7efa1` |
+| `dist/assets/index-Cwx5ExvI.css` | 50,249 B | 10,945 B · 10.95 kB | `69cbdc9e829032df4c99e233a9dd8e4baef52d000e541d825dbacdfe567b063f` |
+| `dist/index.html` | 905 B | 498 B · 0.50 kB | `6b98a91c138596ac1b4abe38eb78b4caf8be79d68ec3760444a6c244fced8700` |
 | `dist/fonts/press-start-2p.woff2` | 12,512 B | _already compressed_ | `afec86997fdaf54af1f59358fa2c1e2a0f1d04146edad18e5cd141d0384a7548` |
 | `dist/fonts/silkscreen-400.woff2` | 8,404 B | _already compressed_ | `e6c72ea4702249202bcdd79d3343057e4e25ef1f04e3fcffd8602ab53b40b4cc` |
 | `dist/fonts/silkscreen-700.woff2` | 7,524 B | _already compressed_ | `5741b7f01a127f40ed70281fa2f686e8fc2cfe241930a120e4d1a1cebe78f995` |
 | `dist/favicon.svg` | 799 B | 283 B · 0.28 kB | `6e4259fa462c07ccd9e6be8b1a3741682374a4da374c7b1da23288a70cf7b21b` |
 
-**JS/CSS/HTML payload:** 413,490 B raw → 129,375 B gzip (129.38 kB).
-**All shipped files:** 442,729 B raw; 129,658 B with the text files above gzipped (fonts are served as-is).
-**Native shells:** `android/app/src/main/assets/public/assets/index-CFRORGl5.js` matches; `ios/App/App/public/assets/index-CFRORGl5.js` matches — `43b889b0…13d8f` in `dist`.
-**Native artifact — Android release bundle:** `android/app/build/outputs/bundle/release/app-release.aab` — 3,434,252 B (3.3 MiB), SHA-256 `3747fa0d9f858ffdfbd9f8ba5286dc23932434ed7b4fcea74a0626303dccc51a`.
+**JS/CSS/HTML payload:** 413,962 B raw → 129,466 B gzip (129.47 kB).
+**All shipped files:** 443,201 B raw; 129,749 B with the text files above gzipped (fonts are served as-is).
+**Native shells:** `android/app/src/main/assets/public/assets/index-C_LtyL8R.js` missing; `ios/App/App/public/assets/index-C_LtyL8R.js` missing — `d54b28d3…676cf` in `dist`.
+_No native artifact was stamped for this web-only record._
 <!-- release-record:end -->
 
 ## What was verified here

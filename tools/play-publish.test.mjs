@@ -69,6 +69,24 @@ function playPublish(args, env = {}) {
   });
 }
 
+test('the AAB build dry-runs the bundle it just produced', () => {
+  const scripts = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')).scripts;
+  const validate = scripts['play:validate'] ?? '';
+  const aabBuild = scripts['mobile:aab'] ?? '';
+
+  assert.match(validate, /play-publish\.mjs --dry-run/);
+  assert.match(validate, /--bundle android\/app\/build\/outputs\/bundle\/release\/app-release\.aab/);
+
+  // Order matters: validate the artifact Gradle just wrote, then stamp the
+  // record. A bad bundle must never get a clean build record.
+  const gradleAt = aabBuild.indexOf('bundleRelease');
+  const validateAt = aabBuild.indexOf('npm run play:validate');
+  const recordAt = aabBuild.indexOf('release-record.mjs');
+  assert.ok(validateAt > 0, 'mobile:aab does not run the Play dry run');
+  assert.ok(gradleAt > 0 && validateAt > gradleAt, 'the dry run must follow bundleRelease');
+  assert.ok(recordAt > validateAt, 'the release record must only be stamped after validation');
+});
+
 test('dry run plans a real release without touching the network', { skip: !bundle && 'no store/*.aab in this checkout' }, () => {
   const meta = readBundleMeta(readFileSync(bundle));
   const result = playPublish(['--dry-run', '--bundle', bundle, '--notes', 'Closed test build.']);
