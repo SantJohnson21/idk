@@ -58,7 +58,14 @@ function playPublish(args, env = {}) {
   return spawnSync(process.execPath, [CLI, ...args], {
     cwd: ROOT,
     encoding: 'utf8',
-    env: { ...process.env, PLAY_SERVICE_ACCOUNT_JSON: fixture, ...env },
+    // Blank the test overrides so these checks always see the real hosts.
+    env: {
+      ...process.env,
+      PLAY_API_BASE_URL: '',
+      PLAY_TOKEN_URI: '',
+      PLAY_SERVICE_ACCOUNT_JSON: fixture,
+      ...env,
+    },
   });
 }
 
@@ -72,6 +79,16 @@ test('dry run plans a real release without touching the network', { skip: !bundl
   assert.match(output, new RegExp(`versionName ${meta.versionName}\\b`));
   assert.match(output, new RegExp(meta.packageName.replaceAll('.', '\\.')));
   assert.match(output, /POST\s+https:\/\/oauth2\.googleapis\.com\/token/);
+  // The default API host must be Google's, not a leftover mock override.
+  assert.match(
+    output,
+    /https:\/\/androidpublisher\.googleapis\.com\/androidpublisher\/v3\/applications\/com\.rewindbowl\.game\/edits/,
+  );
+  // The duplicate-versionCode guard reads Play's uploads before opening an edit.
+  assert.match(
+    output,
+    /GET\s+https:\/\/androidpublisher\.googleapis\.com\/androidpublisher\/v3\/applications\/com\.rewindbowl\.game\/bundles/,
+  );
   assert.match(output, /\/edits\{?|\/edits\b/);
   assert.match(output, /bundles\?uploadType=media/);
   assert.match(output, /\/tracks\/internal/);

@@ -12,7 +12,7 @@
  *
  * Why hand-rolled: the bundle is built by Gradle, but this repo has no JDK,
  * no bundletool and no npm dependencies in a clean checkout, so `fastlane
- * supply` and `gcloud` are both out of reach. RS256 signing plus four REST
+ * supply` and `gcloud` are both out of reach. RS256 signing plus five REST
  * calls is small enough to keep in node:crypto and node:zlib.
  *
  * Nothing here prints the private key or the access token, and error text is
@@ -25,8 +25,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { inflateRawSync } from 'node:zlib';
 
 const REPO_ROOT = fileURLToPath(new URL('..', import.meta.url));
-const TOKEN_URI = 'https://oauth2.googleapis.com/token';
-const API_ROOT = 'https://androidpublisher.googleapis.com/androidpublisher/v3';
+const DEFAULT_TOKEN_URI = 'https://oauth2.googleapis.com/token';
+const DEFAULT_API_BASE = 'https://androidpublisher.googleapis.com';
+const API_VERSION = 'androidpublisher/v3';
 const SCOPE = 'https://www.googleapis.com/auth/androidpublisher';
 const DEFAULT_PACKAGE = 'com.rewindbowl.game';
 const TRACKS = ['internal', 'alpha', 'beta', 'production'];
@@ -73,7 +74,11 @@ const USAGE = `usage: node tools/play-publish.mjs [options]
   --help                this text
 
 The service-account JSON is read from $PLAY_SERVICE_ACCOUNT_JSON, or from
-store/play-service-account.json when that exists.`;
+store/play-service-account.json when that exists.
+
+$PLAY_API_BASE_URL replaces https://androidpublisher.googleapis.com and
+$PLAY_TOKEN_URI replaces https://oauth2.googleapis.com/token. Both exist so the
+test suite can point this script at a local mock instead of Google.`;
 
 export function parseArgs(argv) {
   const opts = { dryRun: false, yes: false, help: false };
@@ -293,6 +298,12 @@ export function resolveKeyPath(env = process.env) {
   return join(REPO_ROOT, 'store', 'play-service-account.json');
 }
 
+/** The key's own token_uri, unless an explicit override is set for tests. */
+export function resolveTokenUri(account, env = process.env) {
+  const override = env.PLAY_TOKEN_URI?.trim();
+  return override || account?.tokenUri || DEFAULT_TOKEN_URI;
+}
+
 /**
  * Parse and prove the service account: right fields, and a PEM that can
  * actually produce an RS256 signature. Nothing here touches the network.
@@ -321,7 +332,7 @@ export function loadServiceAccount(path) {
       throw new CliError(`${path} has no "${field}" — that is not a service-account key`);
     }
   }
-  const tokenUri = typeof json.token_uri === 'string' ? json.token_uri : TOKEN_URI;
+  const tokenUri = typeof json.token_uri === 'string' ? json.token_uri : DEFAULT_TOKEN_URI;
   try {
     const key = createPrivateKey({ key: json.private_key, format: 'pem' });
     if (key.asymmetricKeyType !== 'rsa') throw new Error(`it is a ${key.asymmetricKeyType} key`);
@@ -346,7 +357,7 @@ export function buildAssertion({
   clientEmail,
   privateKey,
   privateKeyId,
-  tokenUri = TOKEN_URI,
+  tokenUri = DEFAULT_TOKEN_URI,
   scope = SCOPE,
   nowMs = Date.now(),
 }) {
@@ -361,12 +372,27 @@ export function buildAssertion({
 
 /* ----------------------------------------------------------------- the plan -- */
 
-export const applicationsUrl = (packageName) => `${API_ROOT}/applications/${encodeURIComponent(packageName)}`;
+/** The API host, overridable so the mock suite never needs Google. */
+export function apiBase(env = process.env) {
+  return (env.PLAY_API_BASE_URL?.trim() || DEFAULT_API_BASE).replace(/\/+$/, '');
+}
 
-export function planRequests({ base, track, versionCode, versionName, bundleBytes, notes }) {
+export const applicationsUrl = (packageName, base = apiBase()) =>
+  `${base}/${API_VERSION}/applications/${encodeURIComponent(packageName)}`;
+
+export function planRequests({
+  base,
+  track,
+  versionCode,
+  versionName,
+  bundleBytes,
+  notes,
+  tokenUri = DEFAULT_TOKEN_URI,
+}) {
   const edit = `${base}/edits/{editId}`;
   return [
-    { step: 'POST', url: TOKEN_URI, detail: 'OAuth2 token from a signed JWT assertion' },
+    { step: 'POST', url: tokenUri, detail: 'OAuth2 token from a signed JWT assertion' },
+    { step: 'GET', url: `${base}/bundles`, detail: 'list uploads — refuse a versionCode Play already has' },
     { step: 'POST', url: `${base}/edits`, detail: 'open an edit (the staging area for one release)' },
     {
       step: 'POST',
@@ -421,12 +447,12 @@ async function call(url, { method = 'GET', token, body, contentType, timeoutMs =
   }
 }
 
-async function mintToken(account) {
+async function mintToken(account, tokenUrl = account.tokenUri) {
   const assertion = buildAssertion({
     clientEmail: account.clientEmail,
     privateKey: account.privateKey,
     privateKeyId: account.privateKeyId,
-    tokenUri: account.tokenUri,
+    tokenUri: tokenUrl,
   });
   const body = new URLSearchParams({
     grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
@@ -434,14 +460,14 @@ async function mintToken(account) {
   }).toString();
   let response;
   try {
-    response = await fetch(account.tokenUri, {
+    response = await fetch(tokenUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body,
       signal: AbortSignal.timeout(60_000),
     });
   } catch (error) {
-    throw new CliError(`could not reach ${account.tokenUri} (${redact(error.message)})`, 1);
+    throw new CliError(`could not reach ${tokenUrl} (${redact(error.message)})`, 1);
   }
   const raw = await response.text();
   if (!response.ok) {
@@ -528,6 +554,7 @@ export async function run(argv = process.argv.slice(2)) {
 
   const keyPath = resolveKeyPath();
   const account = loadServiceAccount(keyPath); // validates the key in a dry run too
+  const tokenUrl = resolveTokenUri(account);
   const track = opts.track ?? 'internal';
   const base = applicationsUrl(packageName);
 
@@ -546,6 +573,7 @@ export async function run(argv = process.argv.slice(2)) {
     versionName: meta.versionName,
     bundleBytes,
     notes,
+    tokenUri: tokenUrl,
   });
   console.log(`\nHTTP plan — ${plan.length} requests${opts.dryRun ? ', none sent in a dry run' : ''}:`);
   plan.forEach((request, index) => {
@@ -560,7 +588,21 @@ export async function run(argv = process.argv.slice(2)) {
 
   if (!opts.yes) await confirm();
 
-  const token = await mintToken(account);
+  const token = await mintToken(account, tokenUrl);
+
+  // Play keeps every uploaded versionCode forever, and uploading one it already
+  // has fails half-way through an edit. This read is cheap; do it first.
+  const existing = await call(`${base}/bundles`, { token });
+  const taken = (Array.isArray(existing.bundles) ? existing.bundles : [])
+    .map((bundle) => Number(bundle.versionCode))
+    .filter((code) => Number.isFinite(code));
+  if (taken.includes(meta.versionCode)) {
+    throw new CliError(
+      `versionCode ${meta.versionCode} is already on Play — bump it ` +
+        `(./gradlew bundleRelease -PversionCode=${meta.versionCode + 1}) and rebuild the AAB`,
+    );
+  }
+
   const edit = await call(`${base}/edits`, {
     method: 'POST',
     token,

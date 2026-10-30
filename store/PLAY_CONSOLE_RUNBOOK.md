@@ -538,9 +538,12 @@ npm run play:publish -- --track internal --notes "Closed test 1.0.0 (1)."
 ```
 
 Without `--yes` it prints the plan and waits for you to type `publish`. The
-sequence is open edit → upload bundle → set the track release (`completed`) →
-commit. If any step after the edit is opened fails, the edit is deleted, so Play
-is never left holding a half-built release.
+sequence is: list the app's existing bundles and refuse a `versionCode` Play has
+already seen, open edit → upload bundle → set the track release (`completed`) →
+commit. The duplicate check matters because Play never forgets a version code:
+rebuilding without a bump would otherwise fail half-way through an edit. If any
+step after the edit is opened fails, the edit is deleted, so Play is never left
+holding a half-built release.
 
 | Flag | Default | Meaning |
 | --- | --- | --- |
@@ -556,6 +559,18 @@ Self-test — generated in-memory key, no Google credential, no network:
 ```bash
 npm run play:publish:test
 ```
+
+That command runs two suites. `tools/play-publish.test.mjs` checks the local
+pieces: the printed plan, the bundle reader, the JWT, and the bad-input exits.
+`tools/play-publish.http.test.mjs` is the one that proves the *exchange*: it
+starts a throwaway HTTP server and points `PLAY_API_BASE_URL` and
+`PLAY_TOKEN_URI` at it, so the token → bundles → edit → upload → track → commit
+sequence really runs over HTTP, including the refusal when Play already reports
+that version code. It asserts the signature on the assertion, that the
+uploaded body hashes to the AAB on disk, the `en-US` notes on the track call,
+and that a failed upload or commit deletes the edit. Both suites are part of
+`npm test` as well. `--dry-run` proves only the local validation; the live path
+against Google stays unexercised until a real key exists.
 
 App creation, the App content declarations, the screenshots, the closed-test
 roster and the production-access application stay manual: the API cannot file a
