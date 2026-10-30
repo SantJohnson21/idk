@@ -54,7 +54,7 @@ The whole game is on the device. Saves are local: uninstalling the app erases th
 - **Tags:** Football, Sports, Retro, Pixel art, Single player, Offline
 - **Contact email:** `tronjohnson57@gmail.com`
 - **Website:** optional
-- **Privacy policy:** `https://santjohnson21.github.io/idk/privacy.html` — canonical Play URL; it must return HTTP 200 before you enter it, and the 2026-10-29 check is still 404 (see the runbook)
+- **Privacy policy:** `https://santjohnson21.github.io/idk/privacy.html` — canonical Play URL; verified **200 text/html** on 2026-10-30 and byte-identical to `docs/privacy.html`, so it is ready to enter (see the runbook)
 
 ## Graphics map
 

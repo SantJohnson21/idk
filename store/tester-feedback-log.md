@@ -28,9 +28,9 @@ bug until proven otherwise.
 
 - [ ] The closed release is live and the **opt-in URL** is pasted into
       [`closed-test-invite.md`](closed-test-invite.md).
-- [ ] The privacy policy URL loads the policy in a browser. **As of 2026-10-29 it
-      is still 404** — see the FALLBACK section of the runbook. Do not send the
-      invitation until this is true.
+- [ ] The privacy policy URL loads the policy in a browser. **Verified 2026-10-30:
+      it returns 200 and serves the committed page byte-for-byte**, so this box is
+      done; re-check it if `docs/` changes.
 - [ ] At least 12 accounts are on the tester list; 14 is the working target.
 - [ ] This file is where reports land, so testers are told one channel only.
 

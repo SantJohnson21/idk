@@ -50,7 +50,7 @@ Answer **No** to every content category:
 - Location sharing: no
 - Purchases or real-money trading: no
 - Ads: no
-- Privacy policy: `https://santjohnson21.github.io/idk/privacy.html` — must return HTTP 200 before submission; the 2026-10-29 live check is still 404
+- Privacy policy: `https://santjohnson21.github.io/idk/privacy.html` — verified **200 text/html** on 2026-10-30; safe to submit
 
 The expected outcome is **Everyone / 3+**. The game is football; tackles are
 abstract pixel collisions and there is no injury depiction.

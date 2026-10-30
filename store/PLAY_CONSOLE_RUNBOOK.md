@@ -7,7 +7,7 @@ physical-device install has been performed in this workspace.**
 If a value below changes, re-run the checks in “Verified against this repo” before
 uploading.
 
-## Verified against this repo on 2026-10-29
+## Verified against this repo on 2026-10-29 (privacy URL re-checked 2026-10-30)
 
 | Check | Measured value |
 | --- | --- |
@@ -23,14 +23,14 @@ uploading.
 | Listing limits | App name **15/30**, short description **71/80**, full description **2,292/4,000**, release notes **251/500** characters |
 | Privacy page | [`docs/privacy.html`](../docs/privacy.html) exists (4,066 B) with the contact set to `tronjohnson57@gmail.com`; no placeholder remains |
 | Policy text | [`store/privacy-policy.md`](privacy-policy.md) exists with the same contact in both places |
-| Privacy hosting | [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) publishes [`docs/`](../docs/) to GitHub Pages on pushes to `main`; [`docs/.nojekyll`](../docs/.nojekyll) is present. **Live check 2026-10-29: the repository is public (an anonymous request for <https://github.com/SantJohnson21/idk> returns 200), the workflow was re-run by push `8af69a5` at 06:09 UTC, and fifteen polls from 06:10:39 to 06:13:00 UTC all returned 404 (`Site not found · GitHub Pages`). `actions/configure-pages@v5` still reports `Get Pages site failed: Not Found`, then `Create Pages site failed: Resource not accessible by integration`, so this is a token-permission wall, not a visibility one: only a repository admin can create the Pages site. Do not enter the URL in Play yet — no public HTML URL currently verifies (see FALLBACK).** |
+| Privacy hosting | [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) publishes [`docs/`](../docs/) to GitHub Pages on pushes to `main`; [`docs/.nojekyll`](../docs/.nojekyll) is present. **Verified live 2026-10-30: the owner enabled Pages (Settings → Pages → Source: GitHub Actions) and <https://santjohnson21.github.io/idk/privacy.html> now returns `200`, `text/html; charset=utf-8`, 4,066 bytes, byte-identical to [`docs/privacy.html`](../docs/privacy.html) (SHA-256 `da25b9e8af31e2caaf9f9c320419c891ad25039bf76eb371a294c1167a3154b6`). The 2026-10-29 404s were the never-created site, not a bad workflow; no further action is needed.** |
 | Declarations file | [`store/data-safety.md`](data-safety.md) exists |
 | Merged permissions | `android.permission.INTERNET`, `android.permission.VIBRATE`, and the app-defined `com.rewindbowl.game.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` — **no `AD_ID`**, no location, camera, microphone, contacts, storage or notification permission |
 | Ads / analytics | No ads or analytics dependencies in [`package.json`](../package.json); `google-services.json` is absent; source search finds no AdMob/AdSense/AppLovin/Unity Ads/IronSource/Firebase/AppsFlyer/Adjust/Sentry/Bugsnag/Segment/Mixpanel/PostHog usage |
 | Network calls | No `fetch`, `XMLHttpRequest`, `WebSocket`, `sendBeacon`, `axios` or `http(s)://` call sites in `../src`, `../index.html` or `../capacitor.config.ts` |
 | Release hardening | AAB application has `allowBackup="false"` and `usesCleartextTraffic="false"` |
 | Upload key | [`android/rewind-bowl-upload.jks`](../android/rewind-bowl-upload.jks) and [`android/keystore.properties`](../android/keystore.properties) exist (gitignored; do not commit or share) |
-| Not verified | No device/emulator install, no testers, no Play upload, no review, no hardware run, and no Pages deployment — the privacy URL is still 404 |
+| Not verified | No device/emulator install, no testers, no Play upload, no review, and no hardware run. The privacy URL is live (see the row above). |
 
 How those checks were made:
 
@@ -60,78 +60,44 @@ user-data permission.
   internal and not a data permission.
 - The release build disables cleartext traffic and Android backup.
 
-## FALLBACK — if the privacy URL is still 404
+## Privacy URL — live and verified
 
-**Status checked 2026-10-29, twice.** `https://santjohnson21.github.io/idk/privacy.html`
-returns **404** (“Site not found · GitHub Pages”). The second check was run after
-confirming the repository is public (anonymous repo page: **200**, which it would
-not be if the repo were private) and after pushing `8af69a5` at 06:09 UTC to
-trigger the workflow: **fifteen polls, 06:10:39 → 06:13:00 UTC, all 404**. The
-site is never created, so nothing is being published — the deploy does not fail
-*after* publishing.
+**Verified 2026-10-30.** `https://santjohnson21.github.io/idk/privacy.html` returns
+**200**, `text/html; charset=utf-8`, **4,066 bytes**, and is byte-identical to
+[`docs/privacy.html`](../docs/privacy.html) — SHA-256
+`da25b9e8af31e2caaf9f9c320419c891ad25039bf76eb371a294c1167a3154b6` on both. The
+site root (`https://santjohnson21.github.io/idk/`) also returns **200**. The served
+page carries `<title>Privacy policy — Rewind Bowl '87</title>`, the policy text and
+the `tronjohnson57@gmail.com` contact, so a browser gets the real page and not a
+wrapper, a redirect or a plain-text file.
 
-The authenticated workflow output is the useful signal: `actions/configure-pages@v5`
-reports `Get Pages site failed: Not Found`, then `Create Pages site failed:
-Resource not accessible by integration`. That is a token-permission error, and the
-Actions `GITHUB_TOKEN` cannot hold repository admin, so the workflow can never
-create the site on its own. The public Pages API reads remain rate-limited from
-this sandbox IP: **403**, `API rate limit exceeded` (0 of 60 remaining).
+**What was wrong:** the Pages site had never been created. `actions/configure-pages@v5`
+reported `Get Pages site failed: Not Found`, then `Create Pages site failed:
+Resource not accessible by integration`, because the Actions `GITHUB_TOKEN` cannot
+hold repository admin. On 2026-10-29 that produced fifteen consecutive 404s
+(`Site not found · GitHub Pages`) even though the workflow ran and the repository
+was public.
 
-A managed static host was tried as an alternative home for `docs/` and its deploy
-API rejected every upload (`invalid_type`) on both environments, so it is not a
-route this repo can rely on.
+**What fixed it:** the repository owner set **Settings → Pages → Source: GitHub
+Actions** in the browser. The workflow then published `docs/` unchanged — no commit
+or workflow edit was needed. The URL is safe to paste into **Store listing →
+Privacy policy** and **App content → Privacy policy**.
 
-**Browser check 2026-10-29 (412×892), re-run with the repository public:** both
-`raw.githack.com/.../privacy.html` and `rawcdn.githack.com/.../privacy.html`
-return **200 text/html** to `curl` with a phone user agent and now carry the real
-4,066-byte page (2 `mailto:` links, full policy text), but headless Chromium in
-both cases receives `External Content Notice | rawgit.hack`: one
-`mailto:admin@githack.com?subject=Abuse`, no policy content — **7 of 11 checks
-fail on each host**. `cdn.jsdelivr.net` and `cdn.statically.io` serve the policy
-as `text/plain`. `htmlpreview.github.io` is a 1,269-byte JavaScript wrapper with
-no policy text in the served HTML. **No public HTML URL currently verifies**;
-`.qa/privacy-live.mjs` is the check that will prove the canonical URL once it
-exists (`RB_PRIVACY_URL=https://santjohnson21.github.io/idk/privacy.html node .qa/privacy-live.mjs`).
+**Regression check** — run it before submitting App content and after any change to
+`docs/`:
 
-**Local verification 2026-10-29 (412×892):** `docs/privacy.html` was served from
-the repo with `python3 -m http.server 4174 --bind 127.0.0.1 --directory docs`
-and loaded in Chromium. `scrollWidth == innerWidth == 412`; headline, body and
-contact sections present; both hrefs are `mailto:tronjohnson57@gmail.com`; both
-mailing-link boxes are **44 px tall**; the contact click dispatches the mailto
-URL; zero console errors or warnings. Screenshot: `artifacts/privacy-phone.png`.
-
-The missing credential is a **repo-admin user token**. This sandbox has none: no
-`GH_TOKEN`/`GITHUB_TOKEN`, `gh auth status` is logged out, no
-`~/.config/gh/hosts.yml`, `~/.netrc` or `~/.git-credentials`, no
-`credential.helper`, and `ssh -T git@github.com` returns `Permission denied
-(publickey)`. The Actions `GITHUB_TOKEN` cannot create a Pages site, even with
-`pages: write`; `enablement: true` cannot change that.
-
-**Smallest one-time fix (browser, no token):**
-1. Open <https://github.com/SantJohnson21/idk/settings/pages>.
-2. Under **Build and deployment → Source**, choose **GitHub Actions**.
-3. Open **Actions → Deploy privacy page → Re-run all jobs**.
-
-**API alternative (repo-admin token):**
 ```bash
-curl -sS -X POST \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Accept: application/vnd.github+json" \
-  https://api.github.com/repos/SantJohnson21/idk/pages \
-  -d '{"build_type":"workflow"}'
+curl -sS -o /tmp/privacy.html -w '%{http_code} %{content_type}\n' \
+  https://santjohnson21.github.io/idk/privacy.html
+sha256sum /tmp/privacy.html docs/privacy.html    # the two hashes must match
 ```
-Use a classic PAT with `repo`, or a fine-grained token with **Pages: Read and
-write** plus **Administration: Read and write** for this repository. A `201`
-means created; `409` means it already exists. Then re-run the workflow. Do not
-use the Actions `GITHUB_TOKEN`.
 
-**Fallback URL while blocked:**
-<https://raw.githubusercontent.com/SantJohnson21/idk/main/docs/privacy.html>
-returns **200**, `text/plain; charset=utf-8`, 4,066 bytes, and contains the
-contact plus both `mailto:` links. It is not a substitute for the Play-facing
-page: Play expects a browser-readable policy page, and raw text is not the
-canonical `github.io` page. Do not enter the raw URL in Play; keep the canonical
-URL pending until it returns 200.
+`.qa/privacy-live.mjs` is the fuller check — it loads the page in Chromium at
+412×892 and asserts the headline, both contact links and the tap targets
+(`RB_PRIVACY_URL=https://santjohnson21.github.io/idk/privacy.html node
+.qa/privacy-live.mjs`). It imports `playwright`, which is not installed in this
+workspace, so the 2026-10-30 verification above used `curl` plus the hash
+comparison; install `playwright` before relying on that harness.
 
 ## Before screen 1
 
@@ -149,20 +115,17 @@ Have these ready:
 | Listing copy | [`store/listing.md`](listing.md) |
 | App content answers | [`store/data-safety.md`](data-safety.md) |
 | Privacy page | [`docs/privacy.html`](../docs/privacy.html) — contact set; publish it with the Pages workflow before entering the URL |
-| Privacy URL | `https://santjohnson21.github.io/idk/privacy.html` — canonical Play URL; **currently 404, so do not enter it until it returns 200** |
+| Privacy URL | `https://santjohnson21.github.io/idk/privacy.html` — canonical Play URL; **verified 200 on 2026-10-30, safe to enter** |
 | Icon | [`store/icon-512.png`](icon-512.png) |
 | Feature graphic | [`store/feature-graphic-1024x500.png`](feature-graphic-1024x500.png) |
 | Screenshots | the six files under [`store/screenshots/`](screenshots/) |
 
 **Privacy hosting:** the contact placeholder is gone; both the page and
-`store/privacy-policy.md` use `tronjohnson57@gmail.com`. The Pages workflow is
-committed, the repository is public, and the site still does not exist: on
-2026-10-29 the canonical URL returned **404** on fifteen consecutive polls after
-a fresh push. The workflow’s authenticated `configure-pages` step reports
-`Get Pages site failed: Not Found` and `Create Pages site failed: Resource not
-accessible by integration` — only a repository admin can create the site. Do not
-submit App content with this URL until it returns 200. See **FALLBACK** below for
-the one-time fix.
+`store/privacy-policy.md` use `tronjohnson57@gmail.com`. Pages is enabled and the
+canonical URL is live: on 2026-10-30 it returned **200 text/html** with 4,066
+bytes byte-identical to `docs/privacy.html` (SHA-256 `da25b9e8…54b6`). Enter it in
+Play as written — see **Privacy URL — live and verified** below.
+
 
 **Signing:** the AAB is signed with the upload key in
 `android/rewind-bowl-upload.jks`. Keep that file and `android/keystore.properties`
@@ -212,9 +175,10 @@ Play Console → **Policy and programs → App content** (some accounts label it
 
 ### Privacy policy
 
-Paste `https://santjohnson21.github.io/idk/privacy.html` only after it returns
-200. The Pages workflow is committed, but the 2026-10-29 live check is still
-**404**; enable Pages first (see “Privacy hosting” above).
+Paste `https://santjohnson21.github.io/idk/privacy.html`. It returned **200** on
+2026-10-30 and serves the committed policy byte-for-byte; there is no placeholder
+left in it (see “Privacy URL — live and verified” above).
+
 
 ### App access
 
@@ -360,7 +324,7 @@ this requirement. Open testing is available only after production access.
 The ready-to-send invitation, opt-in checklist, short message and the exact
 first-build release notes are in
 [`closed-test-invite.md`](closed-test-invite.md). Send it only after the closed
-release is live, the opt-in URL is pasted, and the privacy URL returns 200.
+release is live, the opt-in URL is pasted, and the privacy URL returns 200 (it does — see “Privacy URL — live and verified”).
 
 No testers have been recruited or run from this workspace. This section is setup
 guidance, not a claim that testing happened.
@@ -453,7 +417,7 @@ code `1`.
 | Closed testing page is locked | Finish the Dashboard/App content setup first. |
 | “Apply for production” is greyed out | Fewer than 12 testers opted in, fewer than 14 continuous days, or app setup is incomplete. |
 | Testers see “Item not found” | Wrong Google account, not on the email list, wrong country, or the release is not rolled out. |
-| Privacy policy URL invalid | The 2026-10-29 live check is still 404, so Pages is not enabled. Set **Settings → Pages → Source: GitHub Actions**, re-run the workflow, and confirm the URL returns 200. |
+| Privacy policy URL invalid | Re-check the URL — it returned 200 on 2026-10-30. A rejection now means a typo, or that a later change to `docs/` broke the deploy; run the regression check under “Privacy URL — live and verified”. |
 | Store listing asks for a contact email | Enter `tronjohnson57@gmail.com` in Store settings. |
 | Upload rejects the AAB as “not compatible” | Confirm the package is `com.rewindbowl.game` and the file is the AAB, not the debug APK. |
 

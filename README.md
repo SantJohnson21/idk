@@ -53,9 +53,9 @@ haptics, back button, saves, audio — is [DEVICE-CHECK.md](DEVICE-CHECK.md); ho
 the build stamp on the title card to open the in-game **DEVICE CHECK** panel that
 it refers to. The privacy policy source is
 [`docs/privacy.html`](docs/privacy.html); the
-[Pages workflow](.github/workflows/pages.yml) is committed, but the canonical
-URL still needs the one-time Settings → Pages → Source: GitHub Actions step and
-currently returns 404.
+[Pages workflow](.github/workflows/pages.yml) publishes it to
+<https://santjohnson21.github.io/idk/privacy.html>, which returned 200 on
+2026-10-30.
 
 ## What makes it different
 

@@ -10,9 +10,8 @@ copy, not a claim that a test has run.
 - [ ] At least 12 Google accounts are on the tester list; 14 is better.
 - [ ] The Play Console **opt-in URL** is pasted below.
 - [ ] `https://santjohnson21.github.io/idk/privacy.html` returns HTTP 200.
-      **As of 2026-10-29 it is 404** — GitHub Pages is not enabled, and only the
-      repo owner can enable it (Settings → Pages → Source: GitHub Actions). Do not
-      send this invitation until that URL loads the policy in a browser.
+      **Verified 2026-10-30: 200, `text/html`, the committed policy page.** This
+      box is done; re-check it if `docs/` changes.
 - [ ] The message goes out from `tronjohnson57@gmail.com` or a monitored address.
 - [ ] Testers are asked to stay opted in for 14 continuous days.
 
