@@ -576,6 +576,40 @@ App creation, the App content declarations, the screenshots, the closed-test
 roster and the production-access application stay manual: the API cannot file a
 data safety form or opt a tester in.
 
+## Promoting an existing build
+
+A build only has to be uploaded once. `tools/play-promote.mjs` moves a
+`versionCode` Play already stores from one track to the next — internal → closed
+testing (`alpha`) → production — without touching the bundle.
+
+```bash
+# Plan only: prints the requests, sends nothing.
+npm run play:promote -- --dry-run
+
+# internal → closed testing (alpha)
+npm run play:promote -- --from internal --to alpha
+
+# that same build onward, once testing is done
+npm run play:promote -- --from alpha --to production
+
+# pin an exact build instead of taking the newest released one
+npm run play:promote -- --from internal --to beta --version-code 2
+```
+
+It reads `GET /tracks`, takes the newest `completed` versionCode on `--from`
+(default `internal`), and refuses with exit 2 — before any edit exists — when
+that track has no completed release or when `--version-code` names a build the
+track does not carry. Then it opens an edit, sets `--to` (default `alpha`) to
+that versionCode as `completed`, calls `:validate`, commits, and deletes the edit
+if anything after the edit opens fails. No bundle is uploaded, and the
+duplicate-versionCode rules above are untouched: promotion never adds a build.
+
+`npm run play:promote:test` is what proves the exchange, not `--dry-run`: the
+mock-server suite asserts the track read → edit → track set → validate → commit
+order, the pre-edit refusal (no edit, no upload, no delete), and the cleanup
+DELETE when validation fails. The live path against Google waits for the same
+service-account key as publishing.
+
 ## Official references
 
 - [Create and set up your app](https://support.google.com/googleplay/android-developer/answer/9859152)

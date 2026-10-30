@@ -36,7 +36,7 @@ const BUNDLE_NAME = 'base/manifest/AndroidManifest.xml';
 const CONFIG_NAME = 'BundleConfig.pb';
 
 /** A failure the user can act on. Exit 2 = bad input/config, not a Play problem. */
-class CliError extends Error {
+export class CliError extends Error {
   constructor(message, exitCode = 2) {
     super(message);
     this.name = 'CliError';
@@ -426,7 +426,7 @@ async function readError(response) {
   return redact(body).slice(0, 600) || response.statusText;
 }
 
-async function call(url, { method = 'GET', token, body, contentType, timeoutMs = 180_000 }) {
+export async function call(url, { method = 'GET', token, body, contentType, timeoutMs = 180_000 }) {
   const headers = { Authorization: `Bearer ${token}` };
   if (contentType) headers['Content-Type'] = contentType;
   let response;
@@ -447,7 +447,7 @@ async function call(url, { method = 'GET', token, body, contentType, timeoutMs =
   }
 }
 
-async function mintToken(account, tokenUrl = account.tokenUri) {
+export async function mintToken(account, tokenUrl = account.tokenUri) {
   const assertion = buildAssertion({
     clientEmail: account.clientEmail,
     privateKey: account.privateKey,
@@ -513,15 +513,15 @@ function readNotes(opts) {
   return text;
 }
 
-async function confirm() {
+export async function confirm(word = 'publish') {
   if (!process.stdin.isTTY) {
-    throw new CliError('refusing to publish without --yes when stdin is not a terminal');
+    throw new CliError(`refusing to ${word} without --yes when stdin is not a terminal`);
   }
   const { createInterface } = await import('node:readline/promises');
   const rl = createInterface({ input: process.stdin, output: process.stdout });
   try {
-    const answer = await rl.question('Type "publish" to continue: ');
-    if (answer.trim() !== 'publish') throw new CliError('cancelled — nothing was uploaded');
+    const answer = await rl.question(`Type "${word}" to continue: `);
+    if (answer.trim() !== word) throw new CliError('cancelled — nothing changed');
   } finally {
     rl.close();
   }

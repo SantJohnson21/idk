@@ -17,21 +17,18 @@
 import { after, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash, createVerify, generateKeyPairSync } from 'node:crypto';
-import { createServer } from 'node:http';
-import { spawn } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { API, EDIT_PATH, startMockPlay } from './mock-play.mjs';
 import { readBundleMeta } from './play-publish.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const CLI = join(ROOT, 'tools', 'play-publish.mjs');
 const STORE = join(ROOT, 'store');
 const PACKAGE = 'com.rewindbowl.game';
-const API = `/androidpublisher/v3/applications/${PACKAGE}`;
-const EDIT_PATH = `${API}/edits/qa-edit-1`;
 const SCOPE = 'https://www.googleapis.com/auth/androidpublisher';
 
 const work = mkdtempSync(join(tmpdir(), 'rewind-play-http-'));
@@ -71,26 +68,6 @@ const bundleSha = bundle ? createHash('sha256').update(bundleBytes).digest('hex'
 
 /* ------------------------------------------------------------------- the mock -- */
 
-function replyTo(record) {
-  const { method, path } = record;
-  if (path === '/token' && method === 'POST') {
-    return { status: 200, json: { access_token: 'qa-access-token', token_type: 'Bearer', expires_in: 3600 } };
-  }
-  if (method === 'GET' && path === `${API}/bundles`) {
-    return { status: 200, json: { kind: 'androidpublisher#bundlesList', bundles: [] } };
-  }
-  if (method === 'POST' && path === `${API}/edits`) return { status: 200, json: { id: 'qa-edit-1' } };
-  if (method === 'POST' && path === `${EDIT_PATH}/bundles`) {
-    return { status: 200, json: { versionCode: String(bundleMeta?.versionCode ?? 1) } };
-  }
-  if (method === 'PUT' && path.startsWith(`${EDIT_PATH}/tracks/`)) {
-    return { status: 200, json: { track: path.split('/').pop() } };
-  }
-  if (method === 'POST' && path === `${EDIT_PATH}:commit`) return { status: 200, json: { id: 'qa-edit-1' } };
-  if (method === 'DELETE' && path === EDIT_PATH) return { status: 200, json: { id: 'qa-edit-1' } };
-  return { status: 404, json: { error: { code: 404, message: `unexpected ${method} ${path}` } } };
-}
-
 /** A short, stable name for each request, so order assertions read clearly. */
 function label(record) {
   if (record.path === '/token') return 'token';
@@ -103,70 +80,8 @@ function label(record) {
   return `${record.method} ${record.path}`;
 }
 
-/**
- * Start a mock Play. `fail(record, index)` may return a {status, json} reply to
- * force a failure at a chosen point; returning null lets the default answer run.
- */
-async function startMock(fail) {
-  const requests = [];
-  const server = createServer(async (req, res) => {
-    const chunks = [];
-    for await (const chunk of req) chunks.push(chunk);
-    const body = Buffer.concat(chunks);
-    const url = new URL(req.url, 'http://127.0.0.1');
-    const record = {
-      method: req.method,
-      path: url.pathname,
-      search: url.search,
-      authorization: req.headers.authorization,
-      contentType: req.headers['content-type'] ?? '',
-      body,
-    };
-    requests.push(record);
-    const reply = (fail && fail(record, requests.length)) || replyTo(record);
-    res.writeHead(reply.status, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify(reply.json));
-  });
-
-  await new Promise((resolve, reject) => {
-    server.once('error', reject);
-    server.listen(0, '127.0.0.1', resolve);
-  });
-  const origin = `http://127.0.0.1:${server.address().port}`;
-
-  return {
-    origin,
-    requests,
-    async close() {
-      const done = new Promise((resolve) => server.close(resolve));
-      server.closeAllConnections?.(); // fetch keeps sockets alive
-      await done;
-    },
-    /** Run the real CLI as a child process, pointed at this mock. */
-    run(args) {
-      return new Promise((resolve) => {
-        const child = spawn(process.execPath, [CLI, ...args], {
-          cwd: ROOT,
-          env: {
-            ...process.env,
-            PLAY_SERVICE_ACCOUNT_JSON: fixture,
-            PLAY_API_BASE_URL: origin,
-            PLAY_TOKEN_URI: `${origin}/token`,
-          },
-        });
-        let stdout = '';
-        let stderr = '';
-        child.stdout.setEncoding('utf8').on('data', (chunk) => {
-          stdout += chunk;
-        });
-        child.stderr.setEncoding('utf8').on('data', (chunk) => {
-          stderr += chunk;
-        });
-        child.on('close', (status) => resolve({ status, stdout, stderr, output: stdout + stderr }));
-      });
-    },
-  };
-}
+/** The shared harness from mock-play.mjs, seeded with this suite's fixture. */
+const startMock = (fail) => startMockPlay({ fixture, fail, versionCode: bundleMeta?.versionCode ?? 1 });
 
 /* ----------------------------------------------------------------------- tests -- */
 
