@@ -263,6 +263,12 @@ export function GameScreen({
     return () => window.clearInterval(id);
   }, []);
 
+  // The music lifts through the game: a little more hat and bass each quarter.
+  useEffect(() => {
+    const q = matchRef.current?.state.quarter ?? 1;
+    audio.setIntensity(1 + (q - 1) * 0.25);
+  });
+
   useEffect(() => {
     const m = matchRef.current;
     if (!m) return;

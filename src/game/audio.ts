@@ -6,6 +6,7 @@ class AudioEngine {
   private crowd: { source: AudioBufferSourceNode; gain: GainNode } | null = null;
   private musicTimer: number | null = null;
   private musicStep = 0;
+  private intensity = 1;
   private nextNoteTime = 0;
   private musicGeneration = 0;
   soundOn = true;
@@ -290,8 +291,8 @@ class AudioEngine {
         const delay = Math.max(0, this.nextNoteTime - this.now());
         if (pos % 4 === 0) this.tone(150, 0.16, 'sine', 0.24, 45, delay);
         if (pos === 4 || pos === 12) this.noise(0.09, 0.08, 1500, delay);
-        if (pos % 4 === 2) this.noise(0.03, 0.03, 7000, delay, 'highpass');
-        this.tone(midi(root - 24 + bassLine[pos]), 0.11, 'sawtooth', 0.035, undefined, delay);
+        if (pos % 4 === 2) this.noise(0.03, 0.03 * this.intensity, 7000, delay, 'highpass');
+        this.tone(midi(root - 24 + bassLine[pos]), 0.11, 'sawtooth', 0.035 * this.intensity, undefined, delay);
         this.tone(midi(root + 12 + arp[pos % 4]), 0.08, 'square', 0.02, undefined, delay);
         if (pos === 0) {
           chords[bar].forEach((i) => this.tone(midi(root + i), 0.35, 'square', 0.025, undefined, delay));
@@ -313,6 +314,11 @@ class AudioEngine {
   setMusic(on: boolean) {
     this.musicOn = on;
     if (!on) this.stopMusic();
+  }
+
+  // 1 is the menu bed; the game raises it through the quarters.
+  setIntensity(level: number) {
+    this.intensity = Math.min(2, Math.max(1, level));
   }
 }
 
