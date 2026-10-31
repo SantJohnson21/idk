@@ -105,6 +105,10 @@ export function loadFranchise(slot = activeSlot()): Franchise | null {
     }
     f.seasonStats = f.seasonStats ?? {};
     f.history = f.history ?? [];
+    f.achievements = {
+      unlocked: f.achievements?.unlocked ?? {},
+      touchdowns: Number.isFinite(f.achievements?.touchdowns) ? f.achievements!.touchdowns : 0,
+    };
     f.seasonStage = f.seasonStage ?? 'regular';
     f.playoffSeeds = f.playoffSeeds ?? null;
     f.bowlOpponentId = f.bowlOpponentId ?? null;

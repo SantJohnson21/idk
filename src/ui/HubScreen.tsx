@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { ACHIEVEMENTS } from '../game/achievements';
 import type { Franchise, Player, Ratings } from '../game/types';
 import {
   activeWeek,
@@ -790,6 +791,25 @@ function FilmRoom({ franchise }: { franchise: Franchise }) {
                 </div>
               ))}
               {!franchise.history.length && <Empty text="NO COMPLETED SEASONS" />}
+            </div>
+            <div className="section-head">
+              <h2>MILESTONES</h2>
+              <span className="dim small">
+                {Object.keys(franchise.achievements?.unlocked ?? {}).length}/{ACHIEVEMENTS.length}
+              </span>
+            </div>
+            <div className="history-list">
+              {ACHIEVEMENTS.map((a) => {
+                const season = franchise.achievements?.unlocked[a.id];
+                return (
+                  <div className="history-row" key={a.id}>
+                    <span>{season ? `S${season}` : '—'}</span>
+                    <b>{a.name}</b>
+                    <span className={season ? 'title-badge' : 'dim'}>{season ? 'EARNED' : 'LOCKED'}</span>
+                    <small>{a.desc}</small>
+                  </div>
+                );
+              })}
             </div>
           </Panel>
         </div>

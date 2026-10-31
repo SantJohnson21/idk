@@ -1,5 +1,7 @@
 // Core shared types for Rewind Bowl.
 
+import type { AchievementState } from './achievements';
+
 export type Pos = 'QB' | 'RB' | 'WR' | 'SLOT' | 'TE' | 'OL' | 'DL' | 'LB' | 'CB' | 'S' | 'K';
 
 export type QuirkId =
@@ -151,6 +153,8 @@ export interface Franchise {
   standings: Record<string, { w: number; l: number; t: number; pf: number; pa: number }>;
   seasonStats: Record<string, StatLine>;
   history: SeasonHistory[];
+  /** Milestones earned by this career. Saves from before achievements get an empty set. */
+  achievements?: AchievementState;
   draftPool: Player[] | null;
   /** Veterans on the wire: buy them with tape, and sell your own back onto it. */
   freeAgents: Player[] | null;

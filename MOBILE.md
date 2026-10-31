@@ -235,24 +235,24 @@ number. The version comes from `package.json`. `npm run release:record:check`
 fails when the record no longer matches `dist/`.
 
 <!-- release-record:start -->
-### 2026-10-30 · 1.0.0
+### 2026-10-31 · 1.0.0
 
 | Artifact | Raw | Gzip (text) | SHA-256 |
 | --- | ---: | ---: | --- |
-| `dist/assets/index-BBMuigmK.js` | 361,493 B | 117,290 B · 117.29 kB | `7d0f6e4304c5991332f86f2edb3863c090c3acfd7b3775bcd24b1a5c0701f55c` |
-| `dist/assets/web-BcE0nZlE.js` | 674 B | 331 B · 0.33 kB | `8659a105c4845ae652fedd3118eed6d3ec8472be5f36e30e21bd98510899d20b` |
-| `dist/assets/web-Dz8qgFw2.js` | 119 B | 125 B · 0.13 kB | `0b3ecab526efd4ddd78ea0e6c8bffc14610f2359fa6dd251f73a9d3605e135ba` |
-| `dist/assets/web-kI_sC9OB.js` | 896 B | 454 B · 0.45 kB | `5efe10a9f3775738a0f5644c769d6afa8058e8d7470377028bfc140d0e5e7518` |
+| `dist/assets/index-C_mfuEno.js` | 364,033 B | 118,093 B · 118.09 kB | `69012c2e7bd2481a826d92e8228eab67291c2a6ebd8ac928430b2a1d8028a240` |
+| `dist/assets/web-B4CZtJwV.js` | 119 B | 125 B · 0.13 kB | `6f4d0ed619f48f1f3ae858f106988801466c8ba1c13480d5f0fe4ddb4418c572` |
+| `dist/assets/web-DF-IaayQ.js` | 896 B | 454 B · 0.45 kB | `ea6343dadf2e6b446f63b1d224560eb1f93cdf68ce6551d187a221fe2732d27d` |
+| `dist/assets/web-tcwd85B8.js` | 674 B | 331 B · 0.33 kB | `4e1812489ab238ca2e02e92d2d936c84071168929e7c44c58bc5eed8daa9266b` |
 | `dist/assets/index-Cwx5ExvI.css` | 50,249 B | 10,945 B · 10.95 kB | `69cbdc9e829032df4c99e233a9dd8e4baef52d000e541d825dbacdfe567b063f` |
-| `dist/index.html` | 905 B | 497 B · 0.50 kB | `d8cf5a4260e6696ef33d6b094d503eb358ab4f70329c5de8950b878bf3beb9c4` |
+| `dist/index.html` | 905 B | 497 B · 0.50 kB | `8a43cb78a2335c5b466de3c1106efa6f3c300fad25de4e5ac2cb8123c5f7e361` |
 | `dist/fonts/press-start-2p.woff2` | 12,512 B | _already compressed_ | `afec86997fdaf54af1f59358fa2c1e2a0f1d04146edad18e5cd141d0384a7548` |
 | `dist/fonts/silkscreen-400.woff2` | 8,404 B | _already compressed_ | `e6c72ea4702249202bcdd79d3343057e4e25ef1f04e3fcffd8602ab53b40b4cc` |
 | `dist/fonts/silkscreen-700.woff2` | 7,524 B | _already compressed_ | `5741b7f01a127f40ed70281fa2f686e8fc2cfe241930a120e4d1a1cebe78f995` |
 | `dist/favicon.svg` | 799 B | 283 B · 0.28 kB | `6e4259fa462c07ccd9e6be8b1a3741682374a4da374c7b1da23288a70cf7b21b` |
 
-**JS/CSS/HTML payload:** 414,336 B raw → 129,642 B gzip (129.64 kB).
-**All shipped files:** 443,575 B raw; 129,925 B with the text files above gzipped (fonts are served as-is).
-**Native shells:** `android/app/src/main/assets/public/assets/index-BBMuigmK.js` missing; `ios/App/App/public/assets/index-BBMuigmK.js` missing — `7d0f6e43…1f55c` in `dist`.
+**JS/CSS/HTML payload:** 416,876 B raw → 130,445 B gzip (130.44 kB).
+**All shipped files:** 446,115 B raw; 130,728 B with the text files above gzipped (fonts are served as-is).
+**Native shells:** `android/app/src/main/assets/public/assets/index-C_mfuEno.js` missing; `ios/App/App/public/assets/index-C_mfuEno.js` missing — `69012c2e…8a240` in `dist`.
 _No native artifact was stamped for this web-only record._
 <!-- release-record:end -->
 

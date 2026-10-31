@@ -1,3 +1,4 @@
+import { recordAchievements } from './achievements';
 import type {
   DrivePlay,
   Franchise,
@@ -492,6 +493,14 @@ export function endSeason(franchise: Franchise, wonBowl: boolean): void {
   const bowl = franchise.schedule.find((w) => w.stage === 'bowl' && w.result);
   if (bowl?.result) entry.bowlScore = `${bowl.result.our}-${bowl.result.theirs}`;
   franchise.history = [...franchise.history, entry];
+  const achievements = franchise.achievements ?? { unlocked: {}, touchdowns: 0 };
+  franchise.achievements = achievements;
+  recordAchievements(achievements, franchise.season, {
+    game: null,
+    careerWins: franchise.history.reduce((n, h) => n + h.wins, 0),
+    titles: franchise.history.filter((h) => h.wonBowl).length,
+    endedSeason: entry,
+  });
   franchise.seasonStage = 'offseason';
   if (wonBowl) franchise.tape += 250;
   franchise.roster = franchise.roster.map((p) => ({ ...p, morale: clamp(p.morale + 8, 25, 99) }));
@@ -941,6 +950,7 @@ export function finishGame(franchise: Franchise, summary: GameSummary): void {
   mergeStats(franchise, summary.stats);
   applyMorale(franchise, summary);
   franchise.tape += summary.tapeEarned;
+  recordGameAchievements(franchise, summary);
   franchise.lastGameSummary = {
     week: franchise.week,
     opponentId: summary.opponentId,
@@ -953,6 +963,27 @@ export function finishGame(franchise: Franchise, summary: GameSummary): void {
     mvp: summary.mvpName,
   };
   advanceAfterGame(franchise, summary.win, summary.tie, summary.ourScore, summary.theirScore);
+}
+
+/**
+ * Unlocks milestones for a filed game. Career wins include the season in progress;
+ * season-level milestones are judged in `endSeason`, where the season is filed.
+ */
+function recordGameAchievements(franchise: Franchise, summary: GameSummary): void {
+  const state = franchise.achievements ?? { unlocked: {}, touchdowns: 0 };
+  franchise.achievements = state;
+  recordAchievements(state, franchise.season, {
+    game: {
+      ourScore: summary.ourScore,
+      theirScore: summary.theirScore,
+      win: summary.win,
+      touchdowns: summary.touchdowns,
+      totalYards: summary.totalYards,
+    },
+    careerWins: franchise.history.reduce((n, h) => n + h.wins, 0) + seasonTotals(franchise).wins,
+    titles: franchise.history.filter((h) => h.wonBowl).length,
+    endedSeason: null,
+  });
 }
 
 export function totalYards(franchise: Franchise, stats: Record<string, StatLine>): number {
