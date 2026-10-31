@@ -91,7 +91,8 @@ class AudioEngine {
     if (!this.ctx || !this.soundOn) return;
     switch (name) {
       case 'select':
-        this.tone(520, 0.06, 'square', 0.06);
+        this.tone(880, 0.035, 'square', 0.05, 1320);
+        this.noise(0.02, 0.03, 6000, 0, 'highpass');
         break;
       case 'ready':
         this.tone(380, 0.08, 'square', 0.05);
@@ -134,8 +135,11 @@ class AudioEngine {
         this.tone(880, 0.09, 'square', 0.06, undefined, 0.07);
         break;
       case 'td':
-        [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.22, 'square', 0.08, undefined, i * 0.11));
-        this.noise(0.45, 0.05, 900);
+        // A filtered riser into a stab chord and a bright arpeggio.
+        this.tone(120, 0.6, 'sawtooth', 0.05, 1400);
+        this.noise(0.6, 0.05, 2000, 0, 'highpass');
+        [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 0.22, 'square', 0.08, undefined, 0.6 + i * 0.08));
+        this.noise(0.45, 0.05, 900, 0.6);
         break;
       case 'whistle':
         this.tone(1500, 0.12, 'sine', 0.05, 1900);
@@ -263,22 +267,35 @@ class AudioEngine {
     const gen = ++this.musicGeneration;
     this.nextNoteTime = this.now() + 0.1;
     this.musicStep = 0;
-    const bass = [110, 87.31, 130.81, 98];
-    const lead = [440, 523.25, 659.25, 523.25, 587.33, 659.25, 523.25, 392];
+    // 128 BPM, four bars of Am - F - C - G. Four-on-the-floor kick, clap on 2 and 4,
+    // off-beat hats, a rolling 16th bass, and a square arpeggio over stabs.
+    const midi = (n: number) => 440 * Math.pow(2, (n - 69) / 12);
+    const roots = [57, 53, 48, 55];
+    const chords = [
+      [0, 3, 7],
+      [0, 4, 7],
+      [0, 4, 7],
+      [0, 4, 7],
+    ];
+    const bassLine = [0, 0, 12, 0, 0, 0, 7, 0, 0, 0, 12, 0, 3, 0, 7, 0];
+    const arp = [0, 7, 12, 7];
+    const stepDur = 60 / 128 / 4;
     this.musicTimer = window.setInterval(() => {
       if (!this.ctx || !this.master || this.musicTimer === null || gen !== this.musicGeneration) return;
-      const stepDur = 0.185;
       while (this.nextNoteTime < this.now() + 0.2) {
-        const step = this.musicStep % 32;
-        const bar = Math.floor(step / 8) % 4;
+        const step = this.musicStep % 64;
+        const bar = Math.floor(step / 16) % 4;
+        const pos = step % 16;
+        const root = roots[bar];
         const delay = Math.max(0, this.nextNoteTime - this.now());
-        if (step % 8 === 0) this.tone(bass[bar], 0.4, 'triangle', 0.05, undefined, delay);
-        if (step % 2 === 0) {
-          const note = lead[(step / 2) % lead.length] * (bar === 3 ? 0.75 : 1);
-          this.tone(note, 0.1, 'square', 0.016, undefined, delay);
+        if (pos % 4 === 0) this.tone(150, 0.16, 'sine', 0.24, 45, delay);
+        if (pos === 4 || pos === 12) this.noise(0.09, 0.08, 1500, delay);
+        if (pos % 4 === 2) this.noise(0.03, 0.03, 7000, delay, 'highpass');
+        this.tone(midi(root - 24 + bassLine[pos]), 0.11, 'sawtooth', 0.035, undefined, delay);
+        this.tone(midi(root + 12 + arp[pos % 4]), 0.08, 'square', 0.02, undefined, delay);
+        if (pos === 0) {
+          chords[bar].forEach((i) => this.tone(midi(root + i), 0.35, 'square', 0.025, undefined, delay));
         }
-        if (step % 8 === 0) this.noise(0.06, 0.03, 120, delay, 'lowpass');
-        if (step % 8 === 4) this.noise(0.05, 0.02, 2400, delay, 'highpass');
         this.nextNoteTime += stepDur;
         this.musicStep++;
       }
