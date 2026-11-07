@@ -3,6 +3,7 @@ type OscType = OscillatorType;
 class AudioEngine {
   private ctx: AudioContext | null = null;
   private master: GainNode | null = null;
+  private musicBus: GainNode | null = null;
   private crowd: { source: AudioBufferSourceNode; gain: GainNode } | null = null;
   private musicTimer: number | null = null;
   private musicStep = 0;
@@ -26,6 +27,10 @@ class AudioEngine {
       this.master = this.ctx.createGain();
       this.master.gain.value = 0.32;
       this.master.connect(this.ctx.destination);
+      // The soundtrack sits under the play sounds so calls, hits and the whistle read clearly.
+      this.musicBus = this.ctx.createGain();
+      this.musicBus.gain.value = 0.45;
+      this.musicBus.connect(this.master);
     } catch {
       this.ctx = null;
     }
@@ -48,6 +53,7 @@ class AudioEngine {
     gain = 0.12,
     slideTo?: number,
     delay = 0,
+    dest?: AudioNode,
   ) {
     if (!this.ctx || !this.master || !this.soundOn) return;
     const t = this.now() + delay;
@@ -60,12 +66,19 @@ class AudioEngine {
     g.gain.exponentialRampToValueAtTime(Math.max(0.001, gain), t + 0.012);
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     osc.connect(g);
-    g.connect(this.master);
+    g.connect(dest ?? this.master);
     osc.start(t);
     osc.stop(t + dur + 0.03);
   }
 
-  private noise(dur: number, gain = 0.1, filter = 1200, delay = 0, type: BiquadFilterType = 'bandpass') {
+  private noise(
+    dur: number,
+    gain = 0.1,
+    filter = 1200,
+    delay = 0,
+    type: BiquadFilterType = 'bandpass',
+    dest?: AudioNode,
+  ) {
     if (!this.ctx || !this.master || !this.soundOn) return;
     const t = this.now() + delay;
     const len = Math.max(1, Math.floor(this.ctx.sampleRate * dur));
@@ -83,7 +96,7 @@ class AudioEngine {
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
     src.connect(f);
     f.connect(g);
-    g.connect(this.master);
+    g.connect(dest ?? this.master);
     src.start(t);
     src.stop(t + dur + 0.02);
   }
@@ -289,13 +302,16 @@ class AudioEngine {
         const pos = step % 16;
         const root = roots[bar];
         const delay = Math.max(0, this.nextNoteTime - this.now());
-        if (pos % 4 === 0) this.tone(150, 0.16, 'sine', 0.24, 45, delay);
-        if (pos === 4 || pos === 12) this.noise(0.09, 0.08, 1500, delay);
-        if (pos % 4 === 2) this.noise(0.03, 0.03 * this.intensity, 7000, delay, 'highpass');
-        this.tone(midi(root - 24 + bassLine[pos]), 0.11, 'sawtooth', 0.035 * this.intensity, undefined, delay);
-        this.tone(midi(root + 12 + arp[pos % 4]), 0.08, 'square', 0.02, undefined, delay);
+        const bus = this.musicBus ?? this.master;
+        if (pos % 4 === 0) this.tone(150, 0.16, 'sine', 0.24, 45, delay, bus);
+        if (pos === 4 || pos === 12) this.noise(0.09, 0.08, 1500, delay, 'bandpass', bus);
+        if (pos % 4 === 2) this.noise(0.03, 0.03 * this.intensity, 7000, delay, 'highpass', bus);
+        this.tone(midi(root - 24 + bassLine[pos]), 0.11, 'sawtooth', 0.035 * this.intensity, undefined, delay, bus);
+        this.tone(midi(root + 12 + arp[pos % 4]), 0.08, 'square', 0.02, undefined, delay, bus);
         if (pos === 0) {
-          chords[bar].forEach((i) => this.tone(midi(root + i), 0.35, 'square', 0.025, undefined, delay));
+          chords[bar].forEach((i) =>
+            this.tone(midi(root + i), 0.35, 'square', 0.025, undefined, delay, bus),
+          );
         }
         this.nextNoteTime += stepDur;
         this.musicStep++;
