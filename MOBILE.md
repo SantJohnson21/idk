@@ -239,20 +239,20 @@ fails when the record no longer matches `dist/`.
 
 | Artifact | Raw | Gzip (text) | SHA-256 |
 | --- | ---: | ---: | --- |
-| `dist/assets/index-A5GVvfQt.js` | 364,674 B | 118,331 B · 118.33 kB | `50dfd73320a0f385ca09ea238ec29ba1e67cd2a70c3b82154c7345d13e588714` |
-| `dist/assets/web-Cn_WJ_Iq.js` | 119 B | 126 B · 0.13 kB | `4faf59bb16217caac02c0c35508cbc283a67f385a30b9d650f6ec571d65712b4` |
-| `dist/assets/web-DEFY8A6W.js` | 674 B | 333 B · 0.33 kB | `9a1eb6b6775d9fe89f703394e63944fa180255bfe3cc1ec5d22606b504233a4b` |
-| `dist/assets/web-FYuj6ZHs.js` | 896 B | 455 B · 0.46 kB | `e414a17cc8696473b2cb01af2363d325914dbaed11c3eab04da2471f9bd9772a` |
+| `dist/assets/index-CdojeLcp.js` | 364,674 B | 118,330 B · 118.33 kB | `99deac12ba9ecd12f8837b3b99a5422440d79d98ad2f78672aefebf5618554d6` |
+| `dist/assets/web-BaQiJTPA.js` | 119 B | 123 B · 0.12 kB | `57ff8968c181460b061e15bd0507df5513ad38d90f611e9e174a2cc67b8ef565` |
+| `dist/assets/web-CBGMw5vt.js` | 896 B | 453 B · 0.45 kB | `251c86afa59e403443d698966679250f2e61206a9245e465b96dd4cbafd12d35` |
+| `dist/assets/web-D8G05dLL.js` | 674 B | 329 B · 0.33 kB | `e0206ba91a96181fee7f47337623ac13ed4163e9c3e60afc1c80599169c44f00` |
 | `dist/assets/index-Cwx5ExvI.css` | 50,249 B | 10,945 B · 10.95 kB | `69cbdc9e829032df4c99e233a9dd8e4baef52d000e541d825dbacdfe567b063f` |
-| `dist/index.html` | 905 B | 499 B · 0.50 kB | `ec8684fc5c614e75d31c1597c6d2bb4583c7bf1187e95f4a9b85064bfc5502f2` |
+| `dist/index.html` | 905 B | 496 B · 0.50 kB | `063d4da8600d301a4061193c2f8169d4ed2b34d6b8867189466ec704e4dd713e` |
 | `dist/fonts/press-start-2p.woff2` | 12,512 B | _already compressed_ | `afec86997fdaf54af1f59358fa2c1e2a0f1d04146edad18e5cd141d0384a7548` |
 | `dist/fonts/silkscreen-400.woff2` | 8,404 B | _already compressed_ | `e6c72ea4702249202bcdd79d3343057e4e25ef1f04e3fcffd8602ab53b40b4cc` |
 | `dist/fonts/silkscreen-700.woff2` | 7,524 B | _already compressed_ | `5741b7f01a127f40ed70281fa2f686e8fc2cfe241930a120e4d1a1cebe78f995` |
 | `dist/favicon.svg` | 799 B | 283 B · 0.28 kB | `6e4259fa462c07ccd9e6be8b1a3741682374a4da374c7b1da23288a70cf7b21b` |
 
-**JS/CSS/HTML payload:** 417,517 B raw → 130,689 B gzip (130.69 kB).
-**All shipped files:** 446,756 B raw; 130,972 B with the text files above gzipped (fonts are served as-is).
-**Native shells:** `android/app/src/main/assets/public/assets/index-A5GVvfQt.js` missing; `ios/App/App/public/assets/index-A5GVvfQt.js` missing — `50dfd733…88714` in `dist`.
+**JS/CSS/HTML payload:** 417,517 B raw → 130,676 B gzip (130.68 kB).
+**All shipped files:** 446,756 B raw; 130,959 B with the text files above gzipped (fonts are served as-is).
+**Native shells:** `android/app/src/main/assets/public/assets/index-CdojeLcp.js` missing; `ios/App/App/public/assets/index-CdojeLcp.js` missing — `99deac12…554d6` in `dist`.
 _No native artifact was stamped for this web-only record._
 <!-- release-record:end -->
 

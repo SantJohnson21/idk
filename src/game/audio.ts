@@ -105,8 +105,9 @@ class AudioEngine {
     if (!this.ctx || !this.soundOn) return;
     switch (name) {
       case 'select':
-        this.tone(880, 0.035, 'square', 0.05, 1320);
-        this.noise(0.02, 0.03, 6000, 0, 'highpass');
+        // Kept above the music bed: the menu click was measured quieter than the loop.
+        this.tone(880, 0.035, 'square', 0.08, 1320);
+        this.noise(0.02, 0.05, 6000, 0, 'highpass');
         break;
       case 'ready':
         this.tone(380, 0.08, 'square', 0.05);
@@ -129,7 +130,7 @@ class AudioEngine {
       case 'incomplete':
       case 'drop':
       case 'deflect':
-        this.tone(330, 0.12, 'sawtooth', 0.05, 200);
+        this.tone(330, 0.12, 'sawtooth', 0.07, 200);
         break;
       case 'intercept':
       case 'turnover':
